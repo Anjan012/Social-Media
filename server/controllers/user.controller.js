@@ -109,3 +109,22 @@ export const signIn = async (req, res) => {
     });
   }
 };
+
+export const logout = async (req, res) => {
+    try {
+        return res.status(200)
+        .clearCookie("token", {
+            httpOnly: true,
+            sameSite: "strict",
+            // secure: true, // enable this in production (HTTPS)
+        }).json({
+            message: "logged out successfully",
+            success: true
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: `Internal Server Error`,
+            success: false
+        });
+    }
+};
