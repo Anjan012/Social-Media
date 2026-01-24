@@ -1,53 +1,111 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const signUp = async (req, res) => {
-    try {
+  try {
+    const { username, email, password } = req.body;
 
-        const { username, email, password} = req.body;
-
-        if(!username || !email || !password) {
-            return res.status(400).json({
-                message: "Please provide all required fields",
-                sucess: false
-            });
-        };
-
-        // Check if user already exists
-        const existUser = await User.findOne({
-            $or: [
-                { username},
-                { email}
-            ]
-        });
-
-        if(existUser) {
-            return res.status(409).json({
-                message: "User with this username or email already exists",
-                success: false,
-            });
-        };
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = {
-            username: username,
-            email: email,
-            password: hashedPassword,
-        }
-
-        const createdUser = await User.create(newUser);
-
-        return res.status(201).json({
-            message: "User created successfully",
-            success: true,
-        });
-
-    } catch (error) {
-        console.error("Error in signUp controller:", error);
-        return res.status(500).json({
-            message: "Internal Server Error",
-            success: false,
-        });
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        sucess: false,
+      });
     }
-}
+
+    // Check if user already exists
+    const existUser = await User.findOne({
+      $or: [{ username }, { email }],
+    });
+
+    if (existUser) {
+      return res.status(409).json({
+        message: "User with this username or email already exists",
+        success: false,
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = {
+      username: username,
+      email: email,
+      password: hashedPassword,
+    };
+
+    await User.create(newUser);
+
+    return res.status(201).json({
+      message: "User created successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in signUp controller:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+export const signIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid email or password",
+        success: false,
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        message: "Invalid email or password",
+        success: false,
+      });
+    }
+
+    const tokenData = {
+      userId: user._id,
+    };
+
+    const token = jwt.sign(tokenData, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1d",
+    });
+
+    const userData = user.toObject(); // Convert Mongoose document to plain object
+    delete userData.password; // Remove password field
+
+    return res.status(200)
+    .cookie("token", token, {
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true, // accessible only by web server
+        sameSite: 'strict', // CSRF protection
+        secure: true 
+    })
+    .json({
+        message: `Welcome back, ${user.username}`,
+        success: true,
+        userData,
+    })
+
+  } catch (error) {
+    console.error("Error in signIn controller:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
