@@ -88,19 +88,19 @@ export const signIn = async (req, res) => {
     const userData = user.toObject(); // Convert Mongoose document to plain object
     delete userData.password; // Remove password field
 
-    return res.status(200)
-    .cookie("token", token, {
+    return res
+      .status(200)
+      .cookie("token", token, {
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true, // accessible only by web server
-        sameSite: 'strict', // CSRF protection
-        secure: true 
-    })
-    .json({
+        sameSite: "strict", // CSRF protection
+        secure: true,
+      })
+      .json({
         message: `Welcome back, ${user.username}`,
         success: true,
         userData,
-    })
-
+      });
   } catch (error) {
     console.error("Error in signIn controller:", error);
     return res.status(500).json({
@@ -111,20 +111,66 @@ export const signIn = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-    try {
-        return res.status(200)
-        .clearCookie("token", {
-            httpOnly: true,
-            sameSite: "strict",
-            // secure: true, // enable this in production (HTTPS)
-        }).json({
-            message: "logged out successfully",
-            success: true
-        })
-    } catch (error) {
-        return res.status(500).json({
-            message: `Internal Server Error`,
-            success: false
-        });
+  try {
+    return res
+      .status(200)
+      .clearCookie("token", {
+        httpOnly: true,
+        sameSite: "strict",
+        // secure: true, // enable this in production (HTTPS)
+      })
+      .json({
+        message: "logged out successfully",
+        success: true,
+      });
+  } catch (error) {
+    return res.status(500).json({
+      message: `Internal Server Error`,
+      success: false,
+    });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { username, fullname, bio, location, website, dob } = req.body;
+    const file = req.file;
+
+    // cloudinary will come here....
+
+    const userId = req.id; // come from the middleware
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "User not found",
+        success: false,
+      });
     }
+
+    if (username) user.username = username;
+    if (fullname) user.fullname = fullname;
+    if (bio) user.bio = bio;
+    if (location) user.location = location;
+    if (website) user.website = website;
+    if (dob) user.dob = dob;
+
+    await user.save();
+
+    const userData = user.toObject(); // Convert Mongoose document to plain object
+    delete userData.password; // Remove password field
+
+    return res.status(2000).json({
+        message: "Profile updated Successfully",
+        sucess: true,
+        userData
+    });
+
+  } catch (error) {
+    return res.status(200).json({
+      message: "Internal Server error",
+      success: false,
+    });
+  }
 };
