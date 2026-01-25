@@ -143,7 +143,7 @@ export const updateProfile = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(400).json({
+      return res.status(404).json({
         message: "User not found",
         success: false,
       });
@@ -161,14 +161,15 @@ export const updateProfile = async (req, res) => {
     const userData = user.toObject(); // Convert Mongoose document to plain object
     delete userData.password; // Remove password field
 
-    return res.status(2000).json({
+    return res.status(200).json({
         message: "Profile updated Successfully",
         sucess: true,
         userData
     });
 
   } catch (error) {
-    return res.status(200).json({
+    console.log(`Error while updating the profile: ${error.message}`);
+    return res.status(500).json({
       message: "Internal Server error",
       success: false,
     });
