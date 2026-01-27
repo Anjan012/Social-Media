@@ -1,5 +1,6 @@
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
+import mongoose from "mongoose";
 
 export const createPost = async (req, res) => {
   try {
@@ -66,6 +67,79 @@ export const getAllPost = async (req, res) => {
     console.error("Get posts error:", error);
     return res.status(500).json({
       message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export const getPostById = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      return res.status(400).json({
+        message: "Invalid post ID",
+        success: false,
+      });
+    }
+
+    const post = await Post.findById(postId)
+      .populate("createdBy", "username profilePicture")
+      .populate('comments.user', "username profilePicture");
+
+    if (!post) {
+      return res.status(404).json({
+        message: "Post not found!",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      post,
+    });
+  } catch (error) {
+    console.log(`Error while fetching post: ${error}`);
+    return res.status(500).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export const DeletePost = async (req, res) => {
+  try {
+    const userId = req.id;
+    const postId = req.params.id;
+
+    if(!mongoose.Types.ObjectId.isValid(postId)) {
+      return res.status(400).json({
+        message: "Invalid post ID",
+        success: false
+      });
+    };
+
+    const post = await Post.findOne({ 
+      _id: postId, 
+      createdBy: userId 
+    });
+
+    if (!post) {
+      return res.status(403).json({
+        message: "You are not allowed to delete this post",
+        success: false,
+      });
+    }
+
+    await Post.findByIdAndDelete(postId);
+
+    return res.status(200).json({
+      message: "Post deleted successfully!",
+      success: true,
+    });
+  } catch (error) {
+    console.log(`Error while deleting the post: ${error}`);
+    return res.status(500).json({
+      message: "Internal Server Error!",
       success: false,
     });
   }
