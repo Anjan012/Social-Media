@@ -106,7 +106,7 @@ export const getPostById = async (req, res) => {
   }
 };
 
-export const DeletePost = async (req, res) => {
+export const deletePost = async (req, res) => {
   try {
     const userId = req.id;
     const postId = req.params.id;

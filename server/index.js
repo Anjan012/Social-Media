@@ -4,6 +4,7 @@ import connectDB from './utils/db.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/user.route.js';
+import postRoutes from './routes/post.route.js';
 
 dotenv.config();
 
@@ -28,6 +29,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/user/", userRoutes);
+app.use("/api/v1", postRoutes); 
+
 
 
 connectDB().then(() => {
