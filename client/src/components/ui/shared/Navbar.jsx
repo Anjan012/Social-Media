@@ -17,11 +17,11 @@ export const Navbar = () => {
                     <div className="flex h-14 sm:h-16 items-center justify-between">
 
                         <div className="flex-shrink-0">
-                            <a href="/" className="flex items-center gap-2">
+                            <Link to="/" className="flex items-center gap-2">
                                 <span className="text-2xl sm:text-3xl font-bold tracking-tight text-red-500 hover:text-red-600 transition-colors">
                                     MyApp
                                 </span>
-                            </a>
+                            </Link>
                         </div>
 
                         <div className="hidden md:flex flex-1 max-w-md mx-4 lg:mx-12 justify-center">

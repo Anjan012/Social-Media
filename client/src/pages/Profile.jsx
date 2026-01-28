@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
+import { Navbar } from "../components/ui/shared/Navbar";
 
 export function Profile({
   username = "Anjan khadka ",
@@ -17,6 +18,8 @@ export function Profile({
   location,
 }) {
   return (
+    <>
+    <Navbar />
     <div className="w-full bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
       {/* Cover area */}
       <div className="h-32 sm:h-48 md:h-56 bg-gradient-to-r from-red-400/20 to-purple-500/20 relative" />
@@ -137,5 +140,6 @@ export function Profile({
         </div>
       </div>
     </div>
+    </>
   );
 }
