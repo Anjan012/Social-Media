@@ -5,8 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
 
 export function ProfileHeader({
-  username = "@Anjan_012",
-  displayName = "Anjan khadka",
+  username = "Anjan khadka ",
+  displayName = "@Anjan_012",
   bio = "Capturing moments | Nightlife enthusiast 🌃 | DM for collabs",
   avatarUrl = "https://github.com/shadcn.png",
   postsCount = 35,
