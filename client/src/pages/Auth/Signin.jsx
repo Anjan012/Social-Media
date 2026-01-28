@@ -1,6 +1,22 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export const SignIn = () => {
+
+  const [user, setUser] = useState({
+    email: "",
+    password: ""
+  });
+
+  const handleInput = (event) => {
+    const { name, value } = event.target;
+
+    setUser({ 
+      ...user, 
+      [name]: value 
+    })
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -41,6 +57,8 @@ export const SignIn = () => {
                   autoComplete="email"
                   required
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500 sm:text-sm outline-none transition-colors"
+                  onChange={handleInput}
+                  value={user.email}
                 />
               </div>
             </div>
@@ -60,6 +78,8 @@ export const SignIn = () => {
                   autoComplete="current-password"
                   required
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500 sm:text-sm outline-none transition-colors"
+                  onChange={handleInput}
+                  value = {user.password}
                 />
               </div>
             </div>
