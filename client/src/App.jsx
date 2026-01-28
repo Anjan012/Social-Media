@@ -1,16 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Navbar } from "./components/ui/shared/Navbar";
-import { ProfileHeader } from "./pages/Profile";
 import { SignIn } from "./pages/Auth/Signin";
 import { SignUp } from "./pages/Auth/Signup";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './App.css';
 import { Home } from "./pages/Home";
+import { Profile } from "./pages/Profile";
 
 const appRouter = createBrowserRouter([
   {
     path: "/",
     element: <Home />
+  },
+  {
+    path:'/profile',
+    element: <Profile />
   },
   {
     path:'/signup',

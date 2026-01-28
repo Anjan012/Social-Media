@@ -2,14 +2,12 @@ import React from 'react';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  Popover,
-  PopoverContent,
-  PopoverDescription,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
 import { User2, LogOut } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const Navbar = () => {
     return (
@@ -49,13 +47,13 @@ export const Navbar = () => {
                                 </svg>
                             </button>
 
-                            <a href="/"
+                            <Link to="/"
                                 className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                                 </svg>
                                 <span className="font-medium">Home</span>
-                            </a>
+                            </Link>
 
                             <a href="/" className="md:hidden p-2 rounded-full hover:bg-red-50 text-gray-700 hover:text-red-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -69,27 +67,31 @@ export const Navbar = () => {
                                         <AvatarImage src="https://github.com/shadcn.png" />
                                     </Avatar>
                                 </PopoverTrigger>
-                                 <PopoverContent className='w-80'>
-                                        <div className="flex gap-5 space-y-2">
-                                            <Avatar className="cursor-pointer">
-                                                <AvatarImage src="https://github.com/shadcn.png" />
-                                            </Avatar>
-                                            <div>
-                                                <h4 className="font-medium">Anjan MERN Stack</h4>
-                                                <p className="text-sm text-muted-foreground">Lorem ipsum dolor sit amet.</p>
-                                            </div>
+                                <PopoverContent className='w-80'>
+                                    <div className="flex gap-5 space-y-2">
+                                        <Avatar className="cursor-pointer">
+                                            <AvatarImage src="https://github.com/shadcn.png" />
+                                        </Avatar>
+                                        <div>
+                                            <h4 className="font-medium">Anjan MERN Stack</h4>
+                                            <p className="text-sm text-muted-foreground">Lorem ipsum dolor sit amet.</p>
                                         </div>
-                                        <div className="flex flex-col text-gray-600 my-2">
-                                            <div className="flex w-fit items-center gap-2 cursor-pointer">
-                                                <User2 />
+                                    </div>
+                                    <div className="flex flex-col text-gray-600 my-2">
+                                        <div className="flex w-fit items-center gap-2 cursor-pointer">
+                                            <User2 />
+                                            <Link to="/profile">
                                                 <Button variant="link" >View Profile</Button>
-                                            </div>
-                                            <div className="flex w-fit items-center gap-2 cursor-pointer">
-                                                <LogOut />
-                                                <Button variant="link" >Logout</Button>
-                                            </div>
+                                            </Link>
                                         </div>
-                                    </PopoverContent>
+                                        <div className="flex w-fit items-center gap-2 cursor-pointer">
+                                            <LogOut />
+                                            <Link to="/signin">
+                                                <Button variant="link" >Logout</Button>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </PopoverContent>
                             </Popover>
 
 

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
 
-export function ProfileHeader({
+export function Profile({
   username = "Anjan khadka ",
   displayName = "@Anjan_012",
   bio = "Capturing moments | Nightlife enthusiast 🌃 | DM for collabs",
