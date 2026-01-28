@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "allowJs": true,        // Allow JavaScript files
+    "noEmit": true,         // Do not output compiled files
+    "jsx": "react"          // If using React
+  },
+  "include": [
+    "src/**/*",
+    "public/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
