@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 export const SignUp = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -11,12 +12,12 @@ export const SignUp = () => {
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{" "}
-            <a
-              href="/signin"
+            <Link
+              to="/signin"
               className="font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300"
             >
               Sign in
-            </a>
+            </Link>
           </p>
         </div>
       </div>
@@ -26,15 +27,15 @@ export const SignUp = () => {
           <form className="space-y-6">
             <div>
               <label
-                htmlFor="fullname"
+                htmlFor="username"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                Full name
+                Username
               </label>
               <div className="mt-1">
                 <input
-                  id="fullname"
-                  name="fullname"
+                  id="username"
+                  name="username"
                   type="text"
                   autoComplete="name"
                   required

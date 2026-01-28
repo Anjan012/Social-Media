@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export const SignIn = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -11,12 +13,12 @@ export const SignIn = () => {
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
-            <a
-              href="/signup"
+            <Link
+              to="/signup"
               className="font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300"
             >
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
