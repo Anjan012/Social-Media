@@ -149,7 +149,7 @@ export const getUserPost = async (req, res) => {
   try {
     const userId = req.id;
 
-    const post = await Post.findById(userId)
+    const post = await Post.findById({createdBy: userId})
       .populate("createdBy", "username profilePicture")
       .populate('comments.user', "username profilePicture");
 
