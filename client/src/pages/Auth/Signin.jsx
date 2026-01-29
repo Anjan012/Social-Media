@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const SignIn = () => {
+
+  const navigate = useNavigate();
 
   const [user, setUser] = useState({
     email: "",
@@ -11,11 +16,59 @@ export const SignIn = () => {
   const handleInput = (event) => {
     const { name, value } = event.target;
 
-    setUser({ 
-      ...user, 
+    setUser((prev) =>({ 
+      ...prev, 
       [name]: value 
-    })
+    }));
   };
+
+  const validateInput = () => {
+
+    if (!user.email) {
+      toast.error("Email is required!");
+      return false;
+    } else if (!/^\S+@\S+\.\S+$/.test(user.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    if (!user.password) {
+      toast.error("Password is required!");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      if (!validateInput()) return;
+
+      const URL = "http://localhost:3000/api/user/signin/";
+      const dataToSend = {
+        email: user.email,
+        password: user.password
+      };
+      const response = await axios.post(URL, dataToSend);
+
+      if (response.status === 200) {
+        toast.dismiss();
+        toast.success("Success, Redirecting to home page");
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+      }else{
+        console.log(response);
+      }
+
+      
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.log(error);
+    }
+
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -114,6 +167,7 @@ export const SignIn = () => {
               <button
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-red-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 transition-colors"
+                onClick={handleSubmit}
               >
                 Sign in
               </button>
