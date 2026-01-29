@@ -162,15 +162,39 @@ export const updateProfile = async (req, res) => {
     delete userData.password; // Remove password field
 
     return res.status(200).json({
-        message: "Profile updated Successfully",
-        sucess: true,
-        userData
+      message: "Profile updated Successfully",
+      sucess: true,
+      userData,
     });
-
   } catch (error) {
     console.log(`Error while updating the profile: ${error.message}`);
     return res.status(500).json({
       message: "Internal Server error",
+      success: false,
+    });
+  }
+};
+
+const getUserProfile = async (req, res) => {
+  try {
+    const userId = req.id;
+
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found!",
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error",
       success: false,
     });
   }
