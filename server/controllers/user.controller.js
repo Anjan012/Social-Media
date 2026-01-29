@@ -175,7 +175,7 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   try {
     const userId = req.id;
 
