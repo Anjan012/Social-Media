@@ -1,21 +1,97 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+
 export const SignUp = () => {
+
+  const navigate = useNavigate();
 
   const [user, setUser] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
+    terms: false
   });
 
   const handleInput = (event) => {
-    const { name, value } = event.target;
+    const { name, value, type, checked } = event.target;
 
-    setUser({
-      ...user,
-      [name]: value
-    })
+    setUser((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value
+    }));
   };
+
+  const validateInput = () => {
+    if (!user.username.trim()) {
+      toast.error("Username is required!");
+      return false;
+    }
+
+    if (!user.email) {
+      toast.error("Email is required!");
+      return false;
+    } else if (!/^\S+@\S+\.\S+$/.test(user.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    if (!user.password) {
+      toast.error("Password is required!");
+      return false;
+    }
+
+    if (!user.terms) {
+      toast.error("Please agree the terms and conditions");
+      return false;
+    }
+
+    // Optional: add more rules (length, special chars...)
+    // if (user.password.length < 8) {
+    //   toast.error("Password must be at least 8 characters");
+    //   return false;
+    // }
+
+    return true;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      if (!validateInput()) return;
+
+      const toastId = toast.loading("creating your account...");
+
+      const URL = "http://localhost:3000/api/user/signup/";
+      const dataToSend = {
+        username: user.username,
+        email: user.email,
+        password: user.password
+      };
+      const response = await axios.post(URL, dataToSend);
+
+      toast.dismiss(toastId);
+
+      if (response.status === 201) {
+        toast.dismiss();
+        toast.success("Account created! Redirecting to sign in...");
+        setTimeout(() => {
+          navigate('/signin');
+        }, 1500);
+      }else{
+        console.log(response);
+      }
+
+      
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.log(error);
+    }
+
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -132,6 +208,8 @@ export const SignUp = () => {
                   type="checkbox"
                   required
                   className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                  onChange={handleInput}
+                  value={user.terms}
                 />
               </div>
               <div className="ml-3 text-sm">
@@ -158,6 +236,7 @@ export const SignUp = () => {
               <button
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-red-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 transition-colors"
+                onClick={handleSubmit}
               >
                 Create account
               </button>

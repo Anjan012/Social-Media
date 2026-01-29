@@ -12,7 +12,7 @@ const app = express();
 
 
 const corsOptions = {
-    origin: "http://localhost:5137", // allow requests from this origin
+    origin: "http://localhost:5173", // allow requests from this origin
     optionsSuccessStatus: 200,
     credentials: true
 };
