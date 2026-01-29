@@ -71,7 +71,7 @@ export const SignUp = () => {
         email: user.email,
         password: user.password
       };
-      const response = await axios.post(URL, dataToSend);
+      const response = await axios.post(URL, dataToSend, {withCredentials:true});
 
       toast.dismiss(toastId);
 

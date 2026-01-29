@@ -50,7 +50,7 @@ export const SignIn = () => {
         email: user.email,
         password: user.password
       };
-      const response = await axios.post(URL, dataToSend);
+      const response = await axios.post(URL, dataToSend, {withCredentials: true});
 
       if (response.status === 200) {
         toast.dismiss();
