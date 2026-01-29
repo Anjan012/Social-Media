@@ -6,6 +6,10 @@ import { Link as LinkIcon, MapPin, Users } from "lucide-react";
 import { Navbar } from "../components/ui/shared/Navbar";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Image as ImageIcon, X } from "lucide-react";
 
 export function Profile({
   displayName = "@Anjan_012",
@@ -19,7 +23,7 @@ export function Profile({
     const URL = "http://localhost:3000/api/user/profile";
 
     const getProfile = async () => {
-      const response = await axios.get(URL, {withCredentials:true});
+      const response = await axios.get(URL, { withCredentials: true });
       setUser(response.data.user);
       console.log(response.data)
     };
@@ -29,128 +33,241 @@ export function Profile({
   }, [])
   return (
     <>
-    <Navbar />
-    <div className="w-full bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
-      {/* Cover area */}
-      <div className="h-32 sm:h-48 md:h-56 bg-gradient-to-r from-red-400/20 to-purple-500/20 relative" />
+      <Navbar />
+      <div className="w-full bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+        {/* Cover area */}
+        <div className="h-32 sm:h-48 md:h-56 bg-gradient-to-r from-red-400/20 to-purple-500/20 relative" />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Avatar + main content overlapping cover */}
-        <div className="relative -mt-16 sm:-mt-20 pb-6">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:gap-6">
-            {/* Large avatar */}
-            <div className="flex-shrink-0 mx-auto sm:mx-0">
-              <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 border-white dark:border-gray-900 shadow-xl">
-                <AvatarImage src={avatarUrl} alt={displayName} />
-                <AvatarFallback className="text-4xl bg-red-500 text-white">
-                  {displayName?.[0] || "?"}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            {/* Info section */}
-            <div className="flex-1 mt-4 sm:mt-0 text-center sm:text-left">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {user.username}
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">
-                {user.fullname}
-              </p>
-
-              {/* Stats */}
-              <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-2 text-sm">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-gray-900 dark:text-white">
-                    {postsCount.toLocaleString()}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">Posts</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-gray-900 dark:text-white">
-                    {user.followers?.length || 0}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">Followers</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-gray-900 dark:text-white">
-                    {user.following?.length || 0}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">Following</span>
-                </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Avatar + main content overlapping cover */}
+          <div className="relative -mt-16 sm:-mt-20 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:gap-6">
+              {/* Large avatar */}
+              <div className="flex-shrink-0 mx-auto sm:mx-0">
+                <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 border-white dark:border-gray-900 shadow-xl">
+                  <AvatarImage src={avatarUrl} alt={displayName} />
+                  <AvatarFallback className="text-4xl bg-red-500 text-white">
+                    {displayName?.[0] || "?"}
+                  </AvatarFallback>
+                </Avatar>
               </div>
 
-              {/* Bio */}
-              {user.bio && (
-                <p className="mt-3 text-gray-700 dark:text-gray-300 max-w-xl mx-auto sm:mx-0">
-                  {user.bio}
+              {/* Info section */}
+              <div className="flex-1 mt-4 sm:mt-0 text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+                  {user.username}
+                </h1>
+                <p className="text-gray-500 dark:text-gray-400 font-medium">
+                  {user.fullname}
                 </p>
-              )}
-              
 
-              {/* Location & website */}
-              <div className="mt-2 flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-                {user.location && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    <span>{user.location}</span>
+                {/* Stats */}
+                <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-2 text-sm">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {postsCount.toLocaleString()}
+                    </span>
+                    <span className="text-gray-500 dark:text-gray-400">Posts</span>
                   </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {user.followers?.length || 0}
+                    </span>
+                    <span className="text-gray-500 dark:text-gray-400">Followers</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {user.following?.length || 0}
+                    </span>
+                    <span className="text-gray-500 dark:text-gray-400">Following</span>
+                  </div>
+                </div>
+
+                {/* Bio */}
+                {user.bio && (
+                  <p className="mt-3 text-gray-700 dark:text-gray-300 max-w-xl mx-auto sm:mx-0">
+                    {user.bio}
+                  </p>
                 )}
-                {user.website && (
-                  <a
-                    href={user.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:underline"
+
+
+                {/* Location & website */}
+                <div className="mt-2 flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+                  {user.location && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      <span>{user.location}</span>
+                    </div>
+                  )}
+                  {user.website && (
+                    <a
+                      href={user.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:underline"
+                    >
+                      <LinkIcon className="h-4 w-4" />
+                      <span>{user.website}</span>
+                    </a>
+                  )}
+                </div>
+
+                {/* Buttons */}
+                <div className="mt-5 flex flex-wrap justify-center sm:justify-start gap-3">
+                  <Button
+                    className={`min-w-[120px] ${isFollowing
+                        ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+                        : "bg-red-500 hover:bg-red-600 text-white"
+                      }`}
                   >
-                    <LinkIcon className="h-4 w-4" />
-                    <span>{user.website}</span>
-                  </a>
-                )}
-              </div>
+                    {isFollowing ? "Following" : "Follow"}
+                  </Button>
 
-              {/* Buttons */}
-              <div className="mt-5 flex flex-wrap justify-center sm:justify-start gap-3">
-                <Button
-                  className={`min-w-[120px] ${
-                    isFollowing
-                      ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
-                      : "bg-red-500 hover:bg-red-600 text-white"
-                  }`}
-                >
-                  {isFollowing ? "Following" : "Follow"}
-                </Button>
+                  <Button variant="outline" className="min-w-[120px]">
+                    Message
+                  </Button>
 
-                <Button variant="outline" className="min-w-[120px]">
-                  Message
-                </Button>
-
-                <Button variant="ghost" size="icon">
-                  <Users className="h-5 w-5" />
-                </Button>
+                  <Button variant="ghost" size="icon">
+                    <Users className="h-5 w-5" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <Separator className="my-6" />
+          <Separator className="my-6" />
 
-        {/* Tabs */}
-        <div className="flex justify-center sm:justify-start gap-8 text-sm font-medium">
-          <button className="pb-4 border-b-2 border-red-500 text-red-500">
-            Posts
-          </button>
-          <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-            Stories
-          </button>
-          <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-            Photos
-          </button>
-          <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-            Tagged
-          </button>
+          {/* Tabs */}
+          <div className="flex justify-center sm:justify-start gap-8 text-sm font-medium">
+            <button className="pb-4 border-b-2 border-red-500 text-red-500">
+              Posts
+            </button>
+            <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              Stories
+            </button>
+            <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              Photos
+            </button>
+            <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              Tagged
+            </button>
+          </div>
+
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={avatarUrl} alt={displayName} />
+                <AvatarFallback className="bg-red-500 text-white">
+                  {displayName?.[0] || "?"}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1 space-y-4">
+                <Textarea
+                  placeholder="What's on your mind?"
+                  className="min-h-[80px] resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent dark:bg-transparent px-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                />
+
+                {/* File preview (if user selects image/video) */}
+                {/* You would use state + URL.createObjectURL to show preview here */}
+
+                <div className="flex items-center justify-between border-t dark:border-gray-800 pt-3">
+                  <div className="flex items-center gap-4">
+                    <Label
+                      htmlFor="post-image"
+                      className="cursor-pointer flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    >
+                      <ImageIcon className="h-5 w-5" />
+                      <span>Photo/Video</span>
+                      <Input
+                        id="post-image"
+                        type="file"
+                        accept="image/*,video/*"
+                        className="hidden"
+                      // onChange={handleFileChange}  ← add your handler later
+                      />
+                    </Label>
+                  </div>
+
+                  <Button
+                    className="bg-red-500 hover:bg-red-600 text-white px-6"
+                  // onClick={handleCreatePost}  ← add your submit logic later
+                  >
+                    Post
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* === Sample Post (static for now) === */}
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+
+            {/* Post Header */}
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src="https://github.com/shadcn.png" alt="User" />
+                  <AvatarFallback className="bg-red-500 text-white">AH</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    Angelina Hall
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    @angelina_hall • 2h ago
+                  </p>
+                </div>
+              </div>
+              <Button variant="ghost" size="icon" className="text-gray-500">
+                {/* More options icon if you want */}
+              </Button>
+            </div>
+
+            {/* Post Content */}
+            <div className="px-4 pb-3">
+              <p className="text-gray-900 dark:text-white">
+                Another crazy night in the city 🌃✨ Who's joining next weekend?
+              </p>
+            </div>
+
+            {/* Post Image */}
+            <div className="w-full aspect-[4/5] bg-gradient-to-br from-purple-900 to-pink-900 relative">
+              {/*<img src={post.image} className="object-cover w-full h-full" /> */}
+              <div className="absolute inset-0 flex items-center justify-center text-white text-xl font-bold">
+                [Sample Nightlife Photo]
+              </div>
+            </div>
+
+            {/* Post Actions */}
+            <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
+              <div className="flex items-center gap-8">
+                <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span>1.2K</span>
+                </button>
+
+                <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <span>347</span>
+                </button>
+
+                <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367 2.684m0-5.368a3 3 0 10-5.367 2.684m6.632 3.316l-6.632 3.316" />
+                  </svg>
+                  <span>89</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-    </div>
     </>
   );
 }
