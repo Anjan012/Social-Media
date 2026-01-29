@@ -144,3 +144,31 @@ export const deletePost = async (req, res) => {
     });
   }
 };
+
+export const getUserPost = async (req, res) => {
+  try {
+    const userId = req.id;
+
+    const post = await Post.findById(userId)
+      .populate("createdBy", "username profilePicture")
+      .populate('comments.user', "username profilePicture");
+
+    if (!post) {
+      return res.status(404).json({
+        message: "Post not found!",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      post,
+    });
+  } catch (error) {
+    console.log(`Error while fetching post: ${error}`);
+    return res.status(500).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
