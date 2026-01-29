@@ -4,19 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
 import { Navbar } from "../components/ui/shared/Navbar";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export function Profile({
-  username = "Anjan khadka ",
   displayName = "@Anjan_012",
-  bio = "Capturing moments | Nightlife enthusiast 🌃 | DM for collabs",
   avatarUrl = "https://github.com/shadcn.png",
   postsCount = 35,
-  followersCount = 50000,
-  followingCount = 905,
   isFollowing = false,
-  website,
-  location,
 }) {
+  const [user, setUser] = useState([]);
+
+  useEffect(() => {
+    const URL = "http://localhost:3000/api/user/profile";
+
+    const getProfile = async () => {
+      const response = await axios.get(URL, {withCredentials:true});
+      setUser(response.data.user);
+      console.log(response.data)
+    };
+
+    getProfile();
+
+  }, [])
   return (
     <>
     <Navbar />
@@ -41,10 +51,10 @@ export function Profile({
             {/* Info section */}
             <div className="flex-1 mt-4 sm:mt-0 text-center sm:text-left">
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {displayName}
+                {user.username}
               </h1>
               <p className="text-gray-500 dark:text-gray-400 font-medium">
-                {username}
+                {user.fullname}
               </p>
 
               {/* Stats */}
@@ -57,42 +67,43 @@ export function Profile({
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold text-gray-900 dark:text-white">
-                    {followersCount.toLocaleString()}
+                    {user.followers?.length || 0}
                   </span>
                   <span className="text-gray-500 dark:text-gray-400">Followers</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold text-gray-900 dark:text-white">
-                    {followingCount.toLocaleString()}
+                    {user.following?.length || 0}
                   </span>
                   <span className="text-gray-500 dark:text-gray-400">Following</span>
                 </div>
               </div>
 
               {/* Bio */}
-              {bio && (
+              {user.bio && (
                 <p className="mt-3 text-gray-700 dark:text-gray-300 max-w-xl mx-auto sm:mx-0">
-                  {bio}
+                  {user.bio}
                 </p>
               )}
+              
 
               {/* Location & website */}
               <div className="mt-2 flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-                {location && (
+                {user.location && (
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4" />
-                    <span>{location}</span>
+                    <span>{user.location}</span>
                   </div>
                 )}
-                {website && (
+                {user.website && (
                   <a
-                    href={website}
+                    href={user.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:underline"
                   >
                     <LinkIcon className="h-4 w-4" />
-                    <span>Website</span>
+                    <span>{user.website}</span>
                   </a>
                 )}
               </div>
