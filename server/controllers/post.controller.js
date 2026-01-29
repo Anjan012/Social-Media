@@ -151,7 +151,8 @@ export const getUserPost = async (req, res) => {
 
     const post = await Post.find({createdBy: userId})
       .populate("createdBy", "username profilePicture")
-      .populate('comments.user', "username profilePicture");
+      .populate('comments.user', "username profilePicture")
+      .sort({createdAt: -1});
 
     if (!post) {
       return res.status(404).json({

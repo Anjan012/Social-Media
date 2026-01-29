@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Image as ImageIcon, X } from "lucide-react";
+import { toast } from "sonner";
 
 export function Profile({
   displayName = "@Anjan_012",
@@ -19,6 +20,9 @@ export function Profile({
 }) {
   const [user, setUser] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [postData, setPostData] = useState({
+    content: ""
+  });
 
   useEffect(() => {
     const PROFILE_URL = "http://localhost:3000/api/user/profile";
@@ -38,7 +42,48 @@ export function Profile({
     getProfile();
     getUserPost();
 
-  }, [])
+  }, []);
+
+  const handleInput = (event) => {
+    const { name, value } = event.target;
+    setPostData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const validateInput = () => {
+    if (!postData.content.trim()) {
+      toast.error("Content is Empty");
+      return false;
+    }
+    return true;
+  }
+
+
+  const handleCreatePost = async (event) => {
+    event.preventDefault();
+    try {
+      if (!validateInput()) { return };
+      const CREATE_POST_URL = 'http://localhost:3000/api/v1/posts';
+      const dataToSend = {
+        content: postData.content
+      }
+      const response = await axios.post(CREATE_POST_URL, dataToSend,
+        { withCredentials: true }
+      );
+
+      if (response.status === 201) {
+        toast("Post Created Successfully");
+      }
+
+      setPostData({content: ""});
+
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <>
       <Navbar />
@@ -174,6 +219,9 @@ export function Profile({
                 <Textarea
                   placeholder="What's on your mind?"
                   className="min-h-[80px] resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent dark:bg-transparent px-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                  name="content"
+                  onChange={handleInput}
+                  value={postData.content}
                 />
 
                 {/* File preview (if user selects image/video) */}
@@ -199,7 +247,7 @@ export function Profile({
 
                   <Button
                     className="bg-red-500 hover:bg-red-600 text-white px-6"
-                  // onClick={handleCreatePost}  ← add your submit logic later
+                    onClick={handleCreatePost}
                   >
                     Post
                   </Button>
@@ -225,7 +273,7 @@ export function Profile({
                           {post.createdBy.username}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          @angelina_hall • { post.createdAt}
+                          @angelina_hall • {post.createdAt}
                         </p>
                       </div>
                     </div>
@@ -243,10 +291,10 @@ export function Profile({
 
                   {/* Post Image */}
                   {/* <div className="w-full aspect-[4/5] bg-gradient-to-br from-purple-900 to-pink-900 relative"> */}
-                    <img src={post.image || "image"} />
-                    <div className="absolute inset-0 flex items-center justify-center text-white text-xl font-bold">
-                      [Sample Nightlife Photo]
-                    </div>
+                  <img src={post.image || "image"} />
+                  {/* <div className="absolute inset-0 flex items-center justify-center text-white text-xl font-bold">
+                  [Sample Nightlife Photo]
+                </div> */}
                   {/* </div> */}
 
                   {/* Post Actions */}
@@ -281,7 +329,7 @@ export function Profile({
 
 
         </div>
-      </div>
+      </div >
     </>
   );
 }
