@@ -116,10 +116,11 @@ export function Profile({
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Avatar + main content overlapping cover */}
           <div className="relative -mt-16 sm:-mt-20 pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:gap-6">
+            {/* <div className="flex flex-col sm:flex-row sm:items-end sm:gap-6"> */}
+              <div className="flex flex-col sm:flex-row sm:items-start sm:gap-6 lg:gap-6">
               {/* Large avatar */}
               <div className="shrink-0 mx-auto sm:mx-0">
-                <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 border-white dark:border-gray-900 shadow-xl">
+                <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 lg:mt-12 border-white dark:border-gray-900 shadow-xl">
                   <AvatarImage src={avatarUrl} alt={displayName} />
                   <AvatarFallback className="text-4xl bg-red-500 text-white">
                     {displayName?.[0] || "?"}
@@ -128,7 +129,7 @@ export function Profile({
               </div>
 
               {/* Info section */}
-              <div className="flex-1 mt-4 sm:mt-0 text-center sm:text-left">
+              <div className="flex-1 mt-4 sm:mt-20 text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
                   {user.username}
                 </h1>
