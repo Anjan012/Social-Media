@@ -106,6 +106,26 @@ export function Profile({
       console.log(error);
     }
   }
+
+  const handleDeletePost = async (postId) => {
+    try {
+     
+      const DELETE_URL = `http://localhost:3000/api/v1/posts/${postId}`;
+      const response = await axios.delete(
+        DELETE_URL, 
+        {withCredentials:true}
+      );
+
+      if(response.status === 200){
+        toast(`Post deleted successfully ${postId}`);
+      }
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -323,7 +343,7 @@ export function Profile({
                                 </CommandItem>
 
                                 <CommandItem
-                                  // onSelect={() => handleDeletePost(post.id)}
+                                  onSelect={() => handleDeletePost(post._id)}
                                   className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
                                 >
                                   <Trash2 className="h-4 w-4" />
