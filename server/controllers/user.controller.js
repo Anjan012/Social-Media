@@ -93,12 +93,15 @@ export const signIn = async (req, res) => {
       .cookie("token", token, {
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true, // accessible only by web server
-        sameSite: "strict", // CSRF protection
-        secure: true,
+        // sameSite: "strict", // CSRF protection
+        // secure: true,
+        sameSite: "lax",
+        secure: false
       })
       .json({
         message: `Welcome back, ${user.username}`,
         success: true,
+        // token,
         userData,
       });
   } catch (error) {
@@ -116,7 +119,9 @@ export const logout = async (req, res) => {
       .status(200)
       .clearCookie("token", {
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
+        secure: false
+        // sameSite: "strict",
         // secure: true, // enable this in production (HTTPS)
       })
       .json({

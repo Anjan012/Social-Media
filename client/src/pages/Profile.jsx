@@ -249,7 +249,7 @@ export function Profile({
             </button>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6 mt-5">
             <div className="flex items-start gap-3">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={avatarUrl} alt={displayName} />
@@ -302,7 +302,7 @@ export function Profile({
           {
             posts.map((post) => {
               return (
-                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden" key={post._id}>
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden my-1" key={post._id}>
 
                   {/* Post Header */}
                   <div className="flex items-center justify-between px-4 pt-4 pb-2">

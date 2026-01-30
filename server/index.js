@@ -12,8 +12,9 @@ const app = express();
 
 
 const corsOptions = {
-    origin: "http://localhost:5173", // allow requests from this origin
-    optionsSuccessStatus: 200,
+    // origin: "http://localhost:5173", // allow requests from this origin
+    origin: true,
+    // optionsSuccessStatus: 200,
     credentials: true
 };
 app.use(cors(corsOptions));
@@ -27,6 +28,12 @@ app.get("/", (req, res) => {
         success: true
     })
 });
+
+app.use((req, res, next) => {
+  console.log("Cookies:", req.cookies);
+  next();
+});
+
 
 app.use("/api/user/", userRoutes);
 app.use("/api/v1", postRoutes); 
