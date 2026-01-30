@@ -150,7 +150,7 @@ export const getUserPost = async (req, res) => {
     const userId = req.id;
 
     const post = await Post.find({createdBy: userId})
-      .populate("createdBy", "username profilePicture")
+      .populate("createdBy", "username fullname profilePicture")
       .populate('comments.user', "username profilePicture")
       .sort({createdAt: -1});
 

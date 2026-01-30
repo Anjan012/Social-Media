@@ -96,7 +96,7 @@ export function Profile({
           <div className="relative -mt-16 sm:-mt-20 pb-6">
             <div className="flex flex-col sm:flex-row sm:items-end sm:gap-6">
               {/* Large avatar */}
-              <div className="flex-shrink-0 mx-auto sm:mx-0">
+              <div className="shrink-0 mx-auto sm:mx-0">
                 <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 border-white dark:border-gray-900 shadow-xl">
                   <AvatarImage src={avatarUrl} alt={displayName} />
                   <AvatarFallback className="text-4xl bg-red-500 text-white">
@@ -273,7 +273,7 @@ export function Profile({
                           {post.createdBy.username}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          @angelina_hall • {post.createdAt}
+                          @{post.createdBy.fullname} • {post.createdAt}
                         </p>
                       </div>
                     </div>
