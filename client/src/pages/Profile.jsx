@@ -9,8 +9,30 @@ import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Image as ImageIcon, X } from "lucide-react";
+import { Image as ImageIcon, EllipsisVertical } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Trash2,
+  Edit,
+  Bookmark,
+  Flag,
+  Copy,
+  Share2,
+  VolumeX,
+  UserMinus,
+} from "lucide-react";
 
 export function Profile({
   displayName = "@Anjan_012",
@@ -24,6 +46,8 @@ export function Profile({
     content: ""
   });
 
+  const isOwnPost = true;
+
   useEffect(() => {
     const PROFILE_URL = "http://localhost:3000/api/user/profile";
     const POST_URL = "http://localhost:3000/api/v1/userposts/";
@@ -36,7 +60,6 @@ export function Profile({
     const getUserPost = async () => {
       const response = await axios.get(POST_URL, { withCredentials: true });
       setPosts(response.data.post);
-      console.log(response.data)
     }
 
     getProfile();
@@ -60,7 +83,6 @@ export function Profile({
     return true;
   }
 
-
   const handleCreatePost = async (event) => {
     event.preventDefault();
     try {
@@ -77,7 +99,7 @@ export function Profile({
         toast("Post Created Successfully");
       }
 
-      setPostData({content: ""});
+      setPostData({ content: "" });
 
     }
     catch (error) {
@@ -89,7 +111,7 @@ export function Profile({
       <Navbar />
       <div className="w-full bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
         {/* Cover area */}
-        <div className="h-32 sm:h-48 md:h-56 bg-gradient-to-r from-red-400/20 to-purple-500/20 relative" />
+        <div className="h-32 sm:h-48 md:h-56 bg-linear-to-r from-red-400/20 to-purple-500/20 relative" />
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Avatar + main content overlapping cover */}
@@ -277,9 +299,84 @@ export function Profile({
                         </p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-gray-500">
-                      {/* More options icon if you want */}
-                    </Button>
+
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                          <EllipsisVertical className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                        </button>
+                      </PopoverTrigger>
+
+                      <PopoverContent className="w-72 p-0" align="end">
+                        <Command className="rounded-lg border shadow-md">
+                          <CommandList>
+                            {/* For your own post */}
+                            {isOwnPost && (
+                              <CommandGroup>
+                                <CommandItem
+                                  // onSelect={() => handleEditPost(post.id)}
+                                  className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                  <span>Edit post</span>
+                                </CommandItem>
+
+                                <CommandItem
+                                  // onSelect={() => handleDeletePost(post.id)}
+                                  className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  <span>Delete</span>
+                                </CommandItem>
+                              </CommandGroup>
+                            )}
+
+                            {/* Common actions - always visible */}
+                            <CommandGroup>
+                              <CommandItem className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm">
+                                <Bookmark className="h-4 w-4" />
+                                <span>Save post</span>
+                              </CommandItem>
+
+                              <CommandItem className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm">
+                                <Copy className="h-4 w-4" />
+                                <span>Copy link</span>
+                              </CommandItem>
+
+                              <CommandItem className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm">
+                                <Share2 className="h-4 w-4" />
+                                <span>Share to...</span>
+                              </CommandItem>
+                            </CommandGroup>
+
+                            <Separator />
+
+                            {/* Report / Hide / Mute actions */}
+                            <CommandGroup>
+                              <CommandItem className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm">
+                                <Flag className="h-4 w-4" />
+                                <span>Report post</span>
+                              </CommandItem>
+
+                              <CommandItem className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm">
+                                <VolumeX className="h-4 w-4" />
+                                <span>Mute
+                                  {/* {post.author.username} */}
+                                </span>
+                              </CommandItem>
+
+                              {!isOwnPost && (
+                                <CommandItem className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm">
+                                  <UserMinus className="h-4 w-4" />
+                                  <span>Unfollow {post.author.username}</span>
+                                </CommandItem>
+                              )}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+
                   </div>
 
                   {/* Post Content */}
@@ -290,12 +387,7 @@ export function Profile({
                   </div>
 
                   {/* Post Image */}
-                  {/* <div className="w-full aspect-[4/5] bg-gradient-to-br from-purple-900 to-pink-900 relative"> */}
                   <img src={post.image || "image"} />
-                  {/* <div className="absolute inset-0 flex items-center justify-center text-white text-xl font-bold">
-                  [Sample Nightlife Photo]
-                </div> */}
-                  {/* </div> */}
 
                   {/* Post Actions */}
                   <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
@@ -326,8 +418,6 @@ export function Profile({
               )
             })
           }
-
-
         </div>
       </div >
     </>
