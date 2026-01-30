@@ -45,7 +45,7 @@ export const SignIn = () => {
     try {
       if (!validateInput()) return;
 
-      const URL = "http://localhost:3000/api/user/signin/";
+      const URL = "/api/user/signin/";
       const dataToSend = {
         email: user.email,
         password: user.password

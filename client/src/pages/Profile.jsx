@@ -49,8 +49,8 @@ export function Profile({
   const isOwnPost = true;
 
   useEffect(() => {
-    const PROFILE_URL = "http://localhost:3000/api/user/profile";
-    const POST_URL = "http://localhost:3000/api/v1/userposts/";
+    const PROFILE_URL = "/api/user/profile";
+    const POST_URL = "/api/v1/userposts/";
 
     const getProfile = async () => {
       const response = await axios.get(PROFILE_URL, { withCredentials: true });
@@ -87,7 +87,7 @@ export function Profile({
     event.preventDefault();
     try {
       if (!validateInput()) { return };
-      const CREATE_POST_URL = 'http://localhost:3000/api/v1/posts';
+      const CREATE_POST_URL = '/api/v1/posts';
       const dataToSend = {
         content: postData.content
       }
@@ -110,7 +110,7 @@ export function Profile({
   const handleDeletePost = async (postId) => {
     try {
      
-      const DELETE_URL = `http://localhost:3000/api/v1/posts/${postId}`;
+      const DELETE_URL = `/api/v1/posts/${postId}`;
       const response = await axios.delete(
         DELETE_URL, 
         {withCredentials:true}
