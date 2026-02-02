@@ -64,7 +64,7 @@ export const Navbar = () => {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Avatar>
-                                        <AvatarImage src="https://github.com/shadcn.png" />
+                                        <AvatarImage src="default_profile.jpg" />
                                     </Avatar>
                                 </PopoverTrigger>
                                 <PopoverContent className='w-80'>

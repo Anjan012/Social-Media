@@ -37,7 +37,7 @@ import {
 export function Profile({
   displayName = "@Anjan_012",
   // avatarUrl = "https://github.com/shadcn.png",
-  avatarUrl = "https://i.pinimg.com/736x/d5/7e/60/d57e602cbd6924da7a61ff7dc466fa42.jpg",
+  avatarUrl = "default_profile.jpg",
   postsCount = 35,
   isFollowing = false,
 }) {
@@ -409,7 +409,7 @@ export function Profile({
                   </div>
 
                   {/* Post Image */}
-                  <img src={post.image || "https://media.geeksforgeeks.org/wp-content/uploads/20250831124215176976/ygfds.webp"} />
+                  <img src={post.image || "default_post.png"} />
 
                   {/* Post Actions */}
                   <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
