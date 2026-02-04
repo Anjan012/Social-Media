@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,8 +8,21 @@ import {
 } from "@/components/ui/popover";
 import { User2, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export const Navbar = () => {
+
+    const [user, setUser] = useState([]);
+
+    const PROFILE_URL = "/api/user/profile";
+
+
+    const getProfile = async () => {
+        const response = await axios.get(PROFILE_URL, { withCredentials: true });
+        setUser(response.data.user);
+        console.log("user")
+    };
+
     return (
         <>
             <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
@@ -63,18 +76,18 @@ export const Navbar = () => {
 
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <Avatar>
+                                    <Avatar onClick={getProfile}>
                                         <AvatarImage src="default_profile.jpg" />
                                     </Avatar>
                                 </PopoverTrigger>
                                 <PopoverContent className='w-80'>
                                     <div className="flex gap-5 space-y-2">
-                                        <Avatar className="cursor-pointer">
-                                            <AvatarImage src="https://github.com/shadcn.png" />
+                                        <Avatar className="cursor-pointer" >
+                                            <AvatarImage src={user.image || "default_profile.jpg"} />
                                         </Avatar>
                                         <div>
-                                            <h4 className="font-medium">Anjan MERN Stack</h4>
-                                            <p className="text-sm text-muted-foreground">Lorem ipsum dolor sit amet.</p>
+                                            <h4 className="font-medium">{user.username}</h4>
+                                            <p className="text-sm text-muted-foreground">{user?.bio?.slice(0, 20) + "..."}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col text-gray-600 my-2">
