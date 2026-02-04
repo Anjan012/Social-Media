@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
-import { Navbar } from "../components/ui/shared/Navbar";
+import { Navbar } from "../../components/ui/shared/Navbar";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";

@@ -1,11 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Navbar } from "./components/ui/shared/Navbar";
 import { SignIn } from "./pages/Auth/Signin";
 import { SignUp } from "./pages/Auth/Signup";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './App.css';
 import { Home } from "./pages/Home";
-import { Profile } from "./pages/Profile";
+import { Profile } from "./pages/profile/index";
 
 const appRouter = createBrowserRouter([
   {
