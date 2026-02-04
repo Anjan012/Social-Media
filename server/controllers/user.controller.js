@@ -119,7 +119,7 @@ export const logout = async (req, res) => {
       .status(200)
       .clearCookie("token", {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: "lax",
         secure: false
         // sameSite: "strict",
         // secure: true, // enable this in production (HTTPS)

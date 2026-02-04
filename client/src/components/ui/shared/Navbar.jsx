@@ -9,6 +9,7 @@ import {
 import { User2, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 export const Navbar = () => {
 
@@ -20,8 +21,22 @@ export const Navbar = () => {
     const getProfile = async () => {
         const response = await axios.get(PROFILE_URL, { withCredentials: true });
         setUser(response.data.user);
-        console.log("user")
     };
+
+    const handleLogout = async () => {
+        try {
+            const LOGOUT_URL = "/api/user/logout";
+
+            const response = await axios.get(LOGOUT_URL, { withCredentials: true });
+            console.log(user)
+
+            if (response.status === 200) {
+                toast("Logout Successful");
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
 
     return (
         <>
@@ -100,7 +115,7 @@ export const Navbar = () => {
                                         <div className="flex w-fit items-center gap-2 cursor-pointer">
                                             <LogOut />
                                             <Link to="/signin">
-                                                <Button variant="link" >Logout</Button>
+                                                <Button variant="link" onClick={handleLogout}>Logout</Button>
                                             </Link>
                                         </div>
                                     </div>
