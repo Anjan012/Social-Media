@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './App.css';
 import { Home } from "./pages/Home";
 import { Profile } from "./pages/profile/index";
+import ProfileUpdate from "./pages/profile/update-profile/ProfileUpdate";
 
 const appRouter = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const appRouter = createBrowserRouter([
   {
     path:'/signin',
     element: <SignIn />
+  }, 
+  {
+    path: '/profile/update',
+    element: <ProfileUpdate />
   }
 ]);
 
