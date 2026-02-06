@@ -33,6 +33,7 @@ import {
   VolumeX,
   UserMinus,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function Profile({
   displayName = "@Anjan_012",
@@ -48,6 +49,7 @@ export function Profile({
   });
 
   const isOwnPost = true;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const PROFILE_URL = "/api/user/profile";
@@ -234,7 +236,7 @@ export function Profile({
                     <Button
                       variant="outline"
                       className="min-w-[140px] border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700"
-                      onClick={() => navigate("/edit-profile")} // or open modal / go to edit page
+                      onClick={() => navigate("/profile/update")} // or open modal / go to edit page
                     >
                       Edit Profile
                     </Button>
