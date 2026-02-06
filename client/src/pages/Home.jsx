@@ -38,8 +38,6 @@ export const Home = ({
   displayName = "@Anjan_012",
   // avatarUrl = "https://github.com/shadcn.png",
   avatarUrl = "default_profile.jpg",
-  postsCount = 35,
-  isFollowing = false,
 }) => {
   const [user, setUser] = useState([]);
   const [posts, setPosts] = useState([]);
@@ -55,6 +53,7 @@ export const Home = ({
     const fetchAllPost = async () => {
       const response = await axios.get(POST_URL, { withCredentials: true });
       setPosts(response.data.posts);
+      console.log(response);
     }
 
     fetchAllPost();

@@ -110,14 +110,14 @@ export function Profile({
 
   const handleDeletePost = async (postId) => {
     try {
-     
+
       const DELETE_URL = `/api/v1/posts/${postId}`;
       const response = await axios.delete(
-        DELETE_URL, 
-        {withCredentials:true}
+        DELETE_URL,
+        { withCredentials: true }
       );
 
-      if(response.status === 200){
+      if (response.status === 200) {
         toast(`Post deleted successfully ${postId}`);
       }
 
@@ -127,6 +127,7 @@ export function Profile({
     }
   }
 
+  const isOwnProfile = true;
   return (
     <>
       <Navbar />
@@ -137,8 +138,7 @@ export function Profile({
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Avatar + main content overlapping cover */}
           <div className="relative -mt-16 sm:-mt-20 pb-6">
-            {/* <div className="flex flex-col sm:flex-row sm:items-end sm:gap-6"> */}
-              <div className="flex flex-col sm:flex-row sm:items-start sm:gap-6 lg:gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:gap-6 lg:gap-6">
               {/* Large avatar */}
               <div className="shrink-0 mx-auto sm:mx-0">
                 <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 lg:mt-12 border-white dark:border-gray-900 shadow-xl">
@@ -187,7 +187,6 @@ export function Profile({
                   </p>
                 )}
 
-
                 {/* Location & website */}
                 <div className="mt-2 flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
                   {user.location && (
@@ -209,12 +208,13 @@ export function Profile({
                   )}
                 </div>
 
-                {/* Buttons */}
+                {/* Buttons – Added Edit Profile (only visible on own profile) */}
                 <div className="mt-5 flex flex-wrap justify-center sm:justify-start gap-3">
+                  {/* Follow / Message / Users buttons – keep as is */}
                   <Button
                     className={`min-w-[120px] ${isFollowing
-                      ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
-                      : "bg-red-500 hover:bg-red-600 text-white"
+                        ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+                        : "bg-red-500 hover:bg-red-600 text-white"
                       }`}
                   >
                     {isFollowing ? "Following" : "Follow"}
@@ -227,6 +227,19 @@ export function Profile({
                   <Button variant="ghost" size="icon">
                     <Users className="h-5 w-5" />
                   </Button>
+
+                  {/* ──────────────────────────────── */}
+                  {/* NEW: Edit Profile button – only for own profile */}
+                  {isOwnProfile && (
+                    <Button
+                      variant="outline"
+                      className="min-w-[140px] border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700"
+                      onClick={() => navigate("/edit-profile")} // or open modal / go to edit page
+                    >
+                      Edit Profile
+                    </Button>
+                  )}
+                  {/* ──────────────────────────────── */}
                 </div>
               </div>
             </div>
@@ -307,20 +320,22 @@ export function Profile({
 
                   {/* Post Header */}
                   <div className="flex items-center justify-between px-4 pt-4 pb-2">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={avatarUrl} alt="User" />
-                        <AvatarFallback className="bg-red-500 text-white">AH</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">
-                          {post.createdBy.username}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          @{post.createdBy.fullname} • {post.createdAt}
-                        </p>
+                    <a href="#">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={avatarUrl} alt="User" />
+                          <AvatarFallback className="bg-red-500 text-white">AH</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">
+                            {post.createdBy.username}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            @{post.createdBy.fullname} • {post.createdAt}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    </a>
 
                     <Popover>
                       <PopoverTrigger asChild>
