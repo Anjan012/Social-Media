@@ -14,9 +14,6 @@ import { toast } from "sonner";
 
 export const ProfileUpdate = () => {
     const navigate = useNavigate();
-
-
-    // Form state
     const [formData, setFormData] = useState({
         fullname: "",
         username:"",
@@ -57,34 +54,35 @@ export const ProfileUpdate = () => {
         e.preventDefault();
         setIsLoading(true);
 
-        // Prepare form data for backend (multipart/form-data)
-        const submitData = new FormData();
-        submitData.append("fullname", formData.fullname);
-        submitData.append("username", formData.username);
-        submitData.append("bio", formData.bio);
-        submitData.append("location", formData.location);
-        submitData.append("website", formData.website);
+        const submitData = {
+            username: formData.fullname,
+            fullname: formData.username,
+            bio: formData.bio,
+            location: formData.location,
+            website: formData.website
+        }
 
-        // Add files if selected
-        if (profilePicRef.current?.files?.[0]) {
-            submitData.append("profilePicture", profilePicRef.current.files[0]);
-        }
-        if (coverPicRef.current?.files?.[0]) {
-            submitData.append("coverPicture", coverPicRef.current.files[0]);
-        }
+        // // Add files if selected
+        // if (profilePicRef.current?.files?.[0]) {
+        //     submitData.append("profilePicture", profilePicRef.current.files[0]);
+        // }
+        // if (coverPicRef.current?.files?.[0]) {
+        //     submitData.append("coverPicture", coverPicRef.current.files[0]);
+        // }
 
         try {
-            // Example API call (uncomment & adjust)
-            // await axios.patch("http://localhost:3000/api/user/update-profile", submitData, {
-            //   headers: { "Content-Type": "multipart/form-data" },
-            //   withCredentials: true,
-            // });
+            const response = await axios.patch("http://localhost:3000/api/user/profile/update", submitData, {
+              withCredentials: true,
+            });
 
-            // Simulate success
+            if(response.status === 200){
+                // Simulate success
             setTimeout(() => {
                 toast("Profile updated successfully!");
                 navigate("/profile");
             }, 1200);
+            }
+            
         } catch (err) {
             console.error(err);
             alert("Failed to update profile");
