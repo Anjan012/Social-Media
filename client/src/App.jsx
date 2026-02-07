@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './App.css';
 import { Home } from "./pages/Home";
 import { Profile } from "./pages/profile/index";
-import ProfileUpdate from "./pages/profile/update-profile/ProfileUpdate";
+import {ProfileUpdate} from "./pages/profile/update-profile/ProfileUpdate";
 
 const appRouter = createBrowserRouter([
   {
