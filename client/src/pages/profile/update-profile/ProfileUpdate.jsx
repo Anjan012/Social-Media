@@ -123,7 +123,7 @@ export const ProfileUpdate = () => {
   }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 sm:px-2 lg:px-8">
             <div className="max-w-3xl mx-auto">
                 <Card className="border border-gray-200 dark:border-gray-800 shadow-lg overflow-hidden">
                     {/* Cover / Banner Area */}
