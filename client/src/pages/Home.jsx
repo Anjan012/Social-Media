@@ -44,6 +44,8 @@ export const Home = ({
   const [postData, setPostData] = useState({
     content: ""
   });
+  const [media, setMedia] = useState(null);
+
 
   const isOwnPost = true;
 
@@ -57,7 +59,7 @@ export const Home = ({
     }
 
     fetchAllPost();
-  }, []);
+  }, [postData]);
 
 
   const handleInput = (event) => {
@@ -68,48 +70,55 @@ export const Home = ({
     }));
   };
 
-   const validateInput = () => {
-    if (!postData.content.trim()) {
-      toast.error("Content is Empty");
-      return false;
-    }
-    return true;
-  }
+  const handleCreatePost = async (e) => {
+    e.preventDefault();
 
-  const handleCreatePost = async (event) => {
-    event.preventDefault();
+    if (!postData.content.trim() && !media) {
+      toast.error("Post cannot be empty");
+      return;
+    }
+
     try {
-      if (!validateInput()) { return };
-      const CREATE_POST_URL = '/api/v1/posts';
-      const dataToSend = {
-        content: postData.content
+      const formData = new FormData();
+      formData.append("content", postData.content);
+
+      if (media) {
+        formData.append("media", media); // 🔥 MUST MATCH multer
       }
-      const response = await axios.post(CREATE_POST_URL, dataToSend,
-        { withCredentials: true }
+
+      const response = await axios.post(
+        "/api/v1/posts",
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
-      if (response.status === 201) {
-        toast("Post Created Successfully");
-      }
+      toast.success("Post created successfully");
 
       setPostData({ content: "" });
+      setMedia(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create post");
+    }
+  };
 
-    }
-    catch (error) {
-      console.log(error);
-    }
-  }
+
 
   const handleDeletePost = async (postId) => {
     try {
-     
+
       const DELETE_URL = `/api/v1/posts/${postId}`;
       const response = await axios.delete(
-        DELETE_URL, 
-        {withCredentials:true}
+        DELETE_URL,
+        { withCredentials: true }
       );
 
-      if(response.status === 200){
+      if (response.status === 200) {
         toast(`Post deleted successfully ${postId}`);
       }
 
@@ -118,13 +127,20 @@ export const Home = ({
       toast.error(error.message);
     }
   }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setMedia(file);
+    console.log(file);
+  }
+
   return (
     <>
       <Navbar />
       <div className="w-full bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6 mt-5">
             <div className="flex items-start gap-3">
               <Avatar className="h-10 w-10">
@@ -159,7 +175,7 @@ export const Home = ({
                         type="file"
                         accept="image/*,video/*"
                         className="hidden"
-                      // onChange={handleFileChange}  ← add your handler later
+                      onChange={handleFileChange}
                       />
                     </Label>
                   </div>
@@ -284,7 +300,9 @@ export const Home = ({
                   </div>
 
                   {/* Post Image */}
-                  <img src={post.image || "default_post.png"} />
+                  <img src={`http://localhost:3000/${post.image}`} />
+                  {/* <img src={`http://192.168.1.66:3000/${post.image}`} /> */}
+
 
                   {/* Post Actions */}
                   <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">

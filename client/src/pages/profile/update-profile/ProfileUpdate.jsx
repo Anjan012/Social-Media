@@ -71,7 +71,7 @@ export const ProfileUpdate = () => {
         // }
 
         try {
-            const response = await axios.patch("http://localhost:3000/api/user/profile/update", submitData, {
+            const response = await axios.patch("/api/user/profile/update", submitData, {
               withCredentials: true,
             });
 

@@ -69,7 +69,7 @@ export function Profile({
     getProfile();
     getUserPost();
 
-  }, []);
+  }, [postData]);
 
   const handleInput = (event) => {
     const { name, value } = event.target;
@@ -459,7 +459,7 @@ export function Profile({
                           </CommandList>
                         </Command>
                       </PopoverContent>
-                    </Popover> 
+                    </Popover>
 
                   </div>
 
@@ -471,6 +471,8 @@ export function Profile({
                   </div>
                   {/* Post Image */}
                   <img src={`http://localhost:3000/${post.image}`} />
+                  {/* <img src={`http://192.168.1.66:3000/${post.image}`} /> */}
+
 
                   {/* Post Actions */}
                   <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
