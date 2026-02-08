@@ -8,9 +8,9 @@ export const createPost = async (req, res) => {
     const userId = req.id;
 
     const file = req.file;
-    // cloudinary logic goes here for file
 
-    if (!content) {
+    const normalizedPath = file.path.replace(/\\/g, "/");
+    if (!content && !file) {
       return res.status(400).json({
         message: "Content is required!",
         success: false,
@@ -18,7 +18,8 @@ export const createPost = async (req, res) => {
     }
 
     const post = await Post.create({
-      content,
+      content: content || "",
+      image: file ? normalizedPath : null,
       createdBy: userId,
     });
 
@@ -84,7 +85,7 @@ export const getPostById = async (req, res) => {
 
     const post = await Post.findById(postId)
       .populate("createdBy", "username profilePicture")
-      .populate('comments.user', "username profilePicture");
+      .populate("comments.user", "username profilePicture");
 
     if (!post) {
       return res.status(404).json({
@@ -111,16 +112,16 @@ export const deletePost = async (req, res) => {
     const userId = req.id;
     const postId = req.params.id;
 
-    if(!mongoose.Types.ObjectId.isValid(postId)) {
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
       return res.status(400).json({
         message: "Invalid post ID",
-        success: false
+        success: false,
       });
-    };
+    }
 
-    const post = await Post.findOne({ 
-      _id: postId, 
-      createdBy: userId 
+    const post = await Post.findOne({
+      _id: postId,
+      createdBy: userId,
     });
 
     if (!post) {
@@ -149,10 +150,10 @@ export const getUserPost = async (req, res) => {
   try {
     const userId = req.id;
 
-    const post = await Post.find({createdBy: userId})
+    const post = await Post.find({ createdBy: userId })
       .populate("createdBy", "username fullname profilePicture")
-      .populate('comments.user', "username profilePicture")
-      .sort({createdAt: -1});
+      .populate("comments.user", "username profilePicture")
+      .sort({ createdAt: -1 });
 
     if (!post) {
       return res.status(404).json({

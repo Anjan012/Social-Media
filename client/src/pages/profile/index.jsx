@@ -47,6 +47,7 @@ export function Profile({
   const [postData, setPostData] = useState({
     content: ""
   });
+  const [media, setMedia] = useState(null);
 
   const isOwnPost = true;
   const navigate = useNavigate();
@@ -78,37 +79,75 @@ export function Profile({
     }));
   };
 
-  const validateInput = () => {
-    if (!postData.content.trim()) {
-      toast.error("Content is Empty");
-      return false;
-    }
-    return true;
+  // const validateInput = () => {
+  //   if (!postData.content.trim()) {
+  //     toast.error("Content is Empty");
+  //     return false;
+  //   }
+  //   return true;
+  // }
+
+  // const handleCreatePost = async (event) => {
+  //   event.preventDefault();
+  //   try {
+  //     if (!validateInput()) { return };
+  //     const CREATE_POST_URL = '/api/v1/posts';
+  //     const dataToSend = {
+  //       content: postData.content,
+  //       image: media || null
+  //     }
+  //     const response = await axios.post(CREATE_POST_URL, dataToSend,
+  //       { withCredentials: true },
+  //     );
+
+  //     if (response.status === 201) {
+  //       toast("Post Created Successfully");
+  //     }
+
+  //     setPostData({ content: "" });
+
+  //   }
+  //   catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  const handleCreatePost = async (e) => {
+  e.preventDefault();
+
+  if (!postData.content.trim() && !media) {
+    toast.error("Post cannot be empty");
+    return;
   }
 
-  const handleCreatePost = async (event) => {
-    event.preventDefault();
-    try {
-      if (!validateInput()) { return };
-      const CREATE_POST_URL = '/api/v1/posts';
-      const dataToSend = {
-        content: postData.content
-      }
-      const response = await axios.post(CREATE_POST_URL, dataToSend,
-        { withCredentials: true }
-      );
+  try {
+    const formData = new FormData();
+    formData.append("content", postData.content);
 
-      if (response.status === 201) {
-        toast("Post Created Successfully");
-      }
-
-      setPostData({ content: "" });
-
+    if (media) {
+      formData.append("media", media); // 🔥 MUST MATCH multer
     }
-    catch (error) {
-      console.log(error);
-    }
+
+    const response = await axios.post(
+      "/api/v1/posts",
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    toast.success("Post created successfully");
+
+    setPostData({ content: "" });
+    setMedia(null);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to create post");
   }
+};
 
   const handleDeletePost = async (postId) => {
     try {
@@ -127,6 +166,12 @@ export function Profile({
       console.log(error);
       toast.error(error.message);
     }
+  }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setMedia(file);
+    console.log(file);
   }
 
   const isOwnProfile = true;
@@ -292,14 +337,14 @@ export function Profile({
                       htmlFor="post-image"
                       className="cursor-pointer flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                     >
-                      <ImageIcon className="h-5 w-5" />
+                      <ImageIcon className="h-5 w-5" name="image"/>
                       <span>Photo/Video</span>
                       <Input
                         id="post-image"
                         type="file"
                         accept="image/*,video/*"
                         className="hidden"
-                      // onChange={handleFileChange}  ← add your handler later
+                      onChange={handleFileChange} 
                       />
                     </Label>
                   </div>
@@ -414,7 +459,7 @@ export function Profile({
                           </CommandList>
                         </Command>
                       </PopoverContent>
-                    </Popover>
+                    </Popover> 
 
                   </div>
 
@@ -424,9 +469,8 @@ export function Profile({
                       {post.content}
                     </p>
                   </div>
-
                   {/* Post Image */}
-                  <img src={post.image || "default_post.png"} />
+                  <img src={`http://localhost:3000/${post.image}`} />
 
                   {/* Post Actions */}
                   <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
