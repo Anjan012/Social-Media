@@ -79,7 +79,9 @@ export const Home = ({
       formData.append("content", postData.content);
 
       if (media) {
-        formData.append("media", media); // 🔥 MUST MATCH multer
+        formData.append("media", media); 
+      } else{
+        formData.append("media", null); 
       }
 
       const response = await axios.post(
