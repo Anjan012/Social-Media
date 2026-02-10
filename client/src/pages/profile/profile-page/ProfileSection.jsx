@@ -7,7 +7,6 @@ import { Link as LinkIcon, MapPin, Users } from "lucide-react";
 
 
 export const ProfileSection = ({ displayName = "@Anjan_012",
-    // avatarUrl = "https://github.com/shadcn.png",
     avatarUrl = "default_profile.jpg",
     postsCount = 35,
     isFollowing = false,
@@ -104,7 +103,7 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
 
                     <div className="mt-5 flex flex-wrap justify-center sm:justify-start gap-3">
                         <Button
-                            className={`min-w-[120px] ${isFollowing
+                            className={`min-w-30 ${isFollowing
                                 ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
                                 : "bg-red-500 hover:bg-red-600 text-white"
                                 }`}
@@ -112,7 +111,7 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
                             {isFollowing ? "Following" : "Follow"}
                         </Button>
 
-                        <Button variant="outline" className="min-w-[120px]">
+                        <Button variant="outline" className="min-w-30">
                             Message
                         </Button>
 
@@ -123,7 +122,7 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
                         {isOwnProfile && (
                             <Button
                                 variant="outline"
-                                className="min-w-[140px] border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700"
+                                className="min-w-35 border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700"
                                 onClick={() => navigate("/profile/update")} // or open modal / go to edit page
                             >
                                 Edit Profile
