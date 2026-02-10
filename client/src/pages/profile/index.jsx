@@ -32,8 +32,8 @@ import {
   VolumeX,
   UserMinus,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { ProfileSection } from "./profile-page/ProfileSection";
+import { ProfileTab } from "./profile-page/ProfileTab";
 
 export function Profile({
   displayName = "@Anjan_012",
@@ -138,26 +138,9 @@ export function Profile({
         <div className="h-32 sm:h-48 md:h-56 bg-linear-to-r from-red-400/20 to-purple-500/20 relative" />
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Avatar + main content overlapping cover */}
           <ProfileSection />
 
-          <Separator className="my-6" />
-
-          {/* Tabs */}
-          <div className="flex justify-center sm:justify-start gap-8 text-sm font-medium">
-            <button className="pb-4 border-b-2 border-red-500 text-red-500">
-              Posts
-            </button>
-            <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-              Stories
-            </button>
-            <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-              Photos
-            </button>
-            <button className="pb-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-              Tagged
-            </button>
-          </div>
+          <ProfileTab />
 
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6 mt-5">
             <div className="flex items-start gap-3">
