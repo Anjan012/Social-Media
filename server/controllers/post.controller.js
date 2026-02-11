@@ -174,3 +174,33 @@ export const getUserPost = async (req, res) => {
     });
   }
 };
+
+export const toggleLike = async (req, res) => {
+  try {
+    const userId = req.id;
+    const postId = req.params.id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        message: "no post found",
+        status: false,
+      });
+    }
+
+    const isLiked = post.likes.includes(userId);
+
+    if(isLiked) {
+      post.likes.pull(userId);
+    }
+    else {
+      post.likes.addToSet(userId);
+    }
+
+    await post.save();
+
+  } catch (error) {
+    console.log(error);
+  }
+};
