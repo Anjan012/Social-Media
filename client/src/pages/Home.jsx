@@ -35,6 +35,7 @@ export const Home = ({
 }) => {
   const [posts, setPosts] = useState([]);
   const isOwnPost = true;
+  const [postLike, setPostLike] = useState(false);
 
   useEffect(() => {
     const POST_URL = '/api/v1/posts';
@@ -46,7 +47,7 @@ export const Home = ({
     }
 
     fetchAllPost();
-  }, []);
+  }, [postLike]);
 
   const handleDeletePost = async (postId) => {
     try {
@@ -64,6 +65,17 @@ export const Home = ({
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+    }
+  }
+
+  const toggleLike = async (postId) => {
+    try {
+      const LIKE_URL = `/api/v1/posts/${postId}/like`;
+      await axios.post(LIKE_URL, { withCredentials: true });
+      setPostLike(true);
+
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -192,11 +204,16 @@ export const Home = ({
                   {/* Post Actions */}
                   <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
                     <div className="flex items-center gap-8">
-                      <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                      <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" onClick={() => { toggleLike(post._id) }}>
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
-                        <span>1.2K</span>
+                        <span>
+                          {
+                            post.likes.length
+                          }
+                        </span>
+
                       </button>
 
                       <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
