@@ -33,42 +33,51 @@ export const ProfilePost = (
     }
 ) => {
 
-     const [posts, setPosts] = useState([]);
-      const isOwnPost = true;
+    const [posts, setPosts] = useState([]);
+    const isOwnPost = true;
 
-      
-  useEffect(() => {
-    const POST_URL = "/api/v1/userposts/";
 
-    const getUserPost = async () => {
-      const response = await axios.get(POST_URL, { withCredentials: true });
-      setPosts(response.data.post);
-    }
+    useEffect(() => {
+        const POST_URL = "/api/v1/userposts/";
 
-    getUserPost();
+        const getUserPost = async () => {
+            const response = await axios.get(POST_URL, { withCredentials: true });
+            setPosts(response.data.post);
+        }
 
-  }, []);
+        getUserPost();
 
-  
+    }, []);
 
-  const handleDeletePost = async (postId) => {
+    const toggleLike = async (postId) => {
     try {
-
-      const DELETE_URL = `/api/v1/posts/${postId}`;
-      const response = await axios.delete(
-        DELETE_URL,
-        { withCredentials: true }
-      );
-
-      if (response.status === 200) {
-        toast(`Post deleted successfully ${postId}`);
-      }
+      const LIKE_URL = `/api/v1/posts/${postId}/like`;
+      await axios.post(LIKE_URL, { withCredentials: true });
 
     } catch (error) {
       console.log(error);
-      toast.error(error.message);
     }
   }
+
+
+    const handleDeletePost = async (postId) => {
+        try {
+
+            const DELETE_URL = `/api/v1/posts/${postId}`;
+            const response = await axios.delete(
+                DELETE_URL,
+                { withCredentials: true }
+            );
+
+            if (response.status === 200) {
+                toast(`Post deleted successfully ${postId}`);
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+        }
+    }
 
     return (
         <>
@@ -79,22 +88,20 @@ export const ProfilePost = (
 
                             {/* Post Header */}
                             <div className="flex items-center justify-between px-4 pt-4 pb-2">
-                                <a href="#">
-                                    <div className="flex items-center gap-3">
-                                        <Avatar className="h-10 w-10">
-                                            <AvatarImage src={avatarUrl} alt="User" />
-                                            <AvatarFallback className="bg-red-500 text-white">AH</AvatarFallback>
-                                        </Avatar>
-                                        <div>
-                                            <p className="font-semibold text-gray-900 dark:text-white">
-                                                {post.createdBy.username}
-                                            </p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                @{post.createdBy.fullname} • {post.createdAt}
-                                            </p>
-                                        </div>
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-10 w-10">
+                                        <AvatarImage src={avatarUrl} alt="User" />
+                                        <AvatarFallback className="bg-red-500 text-white">AH</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold text-gray-900 dark:text-white">
+                                            {post.createdBy.username}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            @{post.createdBy.fullname} • {post.createdAt}
+                                        </p>
                                     </div>
-                                </a>
+                                </div>
 
                                 <Popover>
                                     <PopoverTrigger asChild>
@@ -181,6 +188,7 @@ export const ProfilePost = (
                                     {post.content}
                                 </p>
                             </div>
+
                             {/* Post Image */}
                             <img src={`http://localhost:3000/${post.image}`} />
                             {/* <img src={`http://192.168.1.66:3000/${post.image}`} /> */}
@@ -189,11 +197,16 @@ export const ProfilePost = (
                             {/* Post Actions */}
                             <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
                                 <div className="flex items-center gap-8">
-                                    <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                                    <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" onClick={() => { toggleLike(post._id) }}>
                                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                         </svg>
-                                        <span>1.2K</span>
+                                        <span>
+                                            {
+                                                post.likes.length
+                                            }
+                                        </span>
+
                                     </button>
 
                                     <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
