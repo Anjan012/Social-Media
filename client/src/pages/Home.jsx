@@ -44,7 +44,6 @@ export const Home = ({
     const fetchAllPost = async () => {
       const response = await axios.get(POST_URL, { withCredentials: true });
       setPosts(response.data.posts);
-      console.log(response);
     }
 
     fetchAllPost();
