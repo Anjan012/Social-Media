@@ -29,6 +29,7 @@ import {
   UserMinus,
 } from "lucide-react";
 import { PostBox } from "./shared/Postbox";
+import { Link } from "react-router-dom";
 
 export const Home = ({
   avatarUrl = "default_profile.jpg",
@@ -101,9 +102,12 @@ export const Home = ({
                         <AvatarFallback className="bg-red-500 text-white">AH</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">
-                          {post.createdBy.username}
-                        </p>
+                        <Link to={`/profile/${post.createdBy._id}`}>
+                          <p className="font-semibold text-gray-900 dark:text-white">
+                            {post.createdBy.username}
+                          </p>
+                        </Link>
+                        
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           @{post.createdBy.fullname} • {post.createdAt}
                         </p>

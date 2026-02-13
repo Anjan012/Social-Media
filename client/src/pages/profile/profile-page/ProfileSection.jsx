@@ -4,6 +4,7 @@ import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "../../../components/ui/button";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
+import { useParams } from "react-router-dom";
 
 
 export const ProfileSection = ({ displayName = "@Anjan_012",
@@ -12,11 +13,12 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
     isFollowing = false,
 }) => {
 
+    const {id} = useParams();
     const [user, setUser] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const PROFILE_URL = "/api/user/profile";
+        const PROFILE_URL = `/api/user/profile/${id}`;
 
         const getProfile = async () => {
             const response = await axios.get(PROFILE_URL, { withCredentials: true });

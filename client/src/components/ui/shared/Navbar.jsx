@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,10 +10,12 @@ import { User2, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 export const Navbar = () => {
 
     const [user, setUser] = useState([]);
+    const navigate = useNavigate();
 
     const PROFILE_URL = "/api/user/profile";
 
@@ -108,8 +110,8 @@ export const Navbar = () => {
                                     <div className="flex flex-col text-gray-600 my-2">
                                         <div className="flex w-fit items-center gap-2 cursor-pointer">
                                             <User2 />
-                                            <Link to="/profile">
-                                                <Button variant="link" >View Profile</Button>
+                                            <Link>
+                                                <Button variant="link" onClick={() => navigate(`/profile/${user._id}`)}>View Profile</Button>
                                             </Link>
                                         </div>
                                         <div className="flex w-fit items-center gap-2 cursor-pointer">
