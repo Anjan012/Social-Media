@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Post } from "../models/post.model.js";
 
 export const signUp = async (req, res) => {
   try {
@@ -182,20 +183,30 @@ export const updateProfile = async (req, res) => {
 
 export const getUserProfile = async (req, res) => {
   try {
-    const userId = req.id;
+    const loggedInUserId = req.id;
+    const profileUserId = req.params.id;
 
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(profileUserId).select("-password");
 
     if (!user) {
       return res.status(404).json({
         message: "User not found!",
         success: false,
       });
-    }
+    };
 
-    res.status(200).json({
+    const posts = await Post.find({createdBy: profileUserId}).sort({createdAt: -1});
+
+    const isOwnProfile = loggedInUserId === profileUserId;
+
+    const isFollowing = user.followers?.includes(loggedInUserId);
+
+    return res.status(200).json({
       success: true,
       user,
+      posts,
+      isOwnProfile,
+      isFollowing
     });
   } catch (error) {
     res.status(500).json({
