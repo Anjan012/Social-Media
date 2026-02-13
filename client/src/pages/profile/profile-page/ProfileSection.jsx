@@ -14,7 +14,9 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
 }) => {
 
     const {id} = useParams();
+    const [profileData, setProfileData] = useState([]);
     const [user, setUser] = useState([]);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -22,6 +24,7 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
 
         const getProfile = async () => {
             const response = await axios.get(PROFILE_URL, { withCredentials: true });
+            setProfileData(response.data);
             setUser(response.data.user);
         };
 
@@ -30,9 +33,12 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
     }, []);
 
     const isOwnProfile = true;
+    // console.log(profileData);
 
     return (
-        <div className="relative -mt-16 sm:-mt-20 pb-6">
+       <>
+       
+       <div className="relative -mt-16 sm:-mt-20 pb-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:gap-6 lg:gap-6">
                 {/* Large avatar */}
                 <div className="shrink-0 mx-auto sm:mx-0">
@@ -134,5 +140,9 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
                 </div>
             </div>
         </div>
+       </>
+
+
+
     )
 }
