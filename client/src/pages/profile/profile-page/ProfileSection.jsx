@@ -1,35 +1,15 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "../../../components/ui/button";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
-import { useParams } from "react-router-dom";
 
 
 export const ProfileSection = ({ displayName = "@Anjan_012",
     avatarUrl = "default_profile.jpg",
-    postsCount = 35,
+    profileData,
+    user
 }) => {
 
-    const { id } = useParams();
-    const [profileData, setProfileData] = useState([]);
-    const [user, setUser] = useState([]);
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const PROFILE_URL = `/api/user/profile/${id}`;
-
-        const getProfile = async () => {
-            const response = await axios.get(PROFILE_URL, { withCredentials: true });
-            setProfileData(response.data);
-            setUser(response.data.user);
-        };
-
-        getProfile();
-
-    }, []);
 
     return (
         <>
