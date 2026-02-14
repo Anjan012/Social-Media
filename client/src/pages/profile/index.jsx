@@ -15,7 +15,6 @@ export function Profile() {
     const [profileData, setProfileData] = useState([]);
     const [user, setUser] = useState([]);
 
-    const navigate = useNavigate();
 
     useEffect(() => {
         const PROFILE_URL = `/api/user/profile/${id}`;
