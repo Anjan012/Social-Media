@@ -5,7 +5,7 @@ import { Link as LinkIcon, MapPin, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 
-export const ProfileSection = ({ displayName = "@Anjan_012",
+export const ProfileSection = ({
     avatarUrl = "default_profile.jpg",
     profileData,
     user
@@ -23,9 +23,11 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
                             {/* Large avatar */}
                             <div className="shrink-0 mx-auto sm:mx-0">
                                 <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 lg:mt-12 border-white dark:border-gray-900 shadow-xl">
-                                    <AvatarImage src={avatarUrl} alt={displayName} />
+                                    <AvatarImage src={avatarUrl} alt="user" />
                                     <AvatarFallback className="text-4xl bg-red-500 text-white">
-                                        {displayName?.[0] || "?"}
+                                        {
+                                            user.username[0]
+                                        }
                                     </AvatarFallback>
                                 </Avatar>
                             </div>
@@ -107,98 +109,100 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
                 ) :
                     (
                         <div className="relative -mt-16 sm:-mt-20 pb-6">
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:gap-6 lg:gap-6">
-                            {/* Large avatar */}
-                            <div className="shrink-0 mx-auto sm:mx-0">
-                                <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 lg:mt-12 border-white dark:border-gray-900 shadow-xl">
-                                    <AvatarImage src={avatarUrl} alt={displayName} />
-                                    <AvatarFallback className="text-4xl bg-red-500 text-white">
-                                        {displayName?.[0] || "?"}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </div>
-
-                            {/* Info section */}
-                            <div className="flex-1 mt-4 sm:mt-20 text-center sm:text-left">
-                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                    {user.username}
-                                </h1>
-                                <p className="text-gray-500 dark:text-gray-400 font-medium">
-                                    {user.fullname}
-                                </p>
-
-                                {/* Stats */}
-                                <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-2 text-sm">
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="font-bold text-gray-900 dark:text-white">
-                                            {profileData.posts?.length}
-                                        </span>
-                                        <span className="text-gray-500 dark:text-gray-400">Posts</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="font-bold text-gray-900 dark:text-white">
-                                            {user.followers?.length || 0}
-                                        </span>
-                                        <span className="text-gray-500 dark:text-gray-400">Followers</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="font-bold text-gray-900 dark:text-white">
-                                            {user.following?.length || 0}
-                                        </span>
-                                        <span className="text-gray-500 dark:text-gray-400">Following</span>
-                                    </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:gap-6 lg:gap-6">
+                                {/* Large avatar */}
+                                <div className="shrink-0 mx-auto sm:mx-0">
+                                    <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 lg:mt-12 border-white dark:border-gray-900 shadow-xl">
+                                        <AvatarImage src={avatarUrl} alt="user" />
+                                        <AvatarFallback className="text-4xl bg-red-500 text-white">
+                                            {
+                                                // user.username[0]
+                                            }
+                                        </AvatarFallback>
+                                    </Avatar>
                                 </div>
 
-                                {/* Bio */}
-                                {user.bio && (
-                                    <p className="mt-3 text-gray-700 dark:text-gray-300 max-w-xl mx-auto sm:mx-0">
-                                        {user.bio}
+                                {/* Info section */}
+                                <div className="flex-1 mt-4 sm:mt-20 text-center sm:text-left">
+                                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                        {user.username}
+                                    </h1>
+                                    <p className="text-gray-500 dark:text-gray-400 font-medium">
+                                        {user.fullname}
                                     </p>
-                                )}
 
-                                {/* Location & website */}
-                                <div className="mt-2 flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-                                    {user.location && (
-                                        <div className="flex items-center gap-1">
-                                            <MapPin className="h-4 w-4" />
-                                            <span>{user.location}</span>
+                                    {/* Stats */}
+                                    <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-2 text-sm">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="font-bold text-gray-900 dark:text-white">
+                                                {profileData.posts?.length}
+                                            </span>
+                                            <span className="text-gray-500 dark:text-gray-400">Posts</span>
                                         </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="font-bold text-gray-900 dark:text-white">
+                                                {user.followers?.length || 0}
+                                            </span>
+                                            <span className="text-gray-500 dark:text-gray-400">Followers</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="font-bold text-gray-900 dark:text-white">
+                                                {user.following?.length || 0}
+                                            </span>
+                                            <span className="text-gray-500 dark:text-gray-400">Following</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Bio */}
+                                    {user.bio && (
+                                        <p className="mt-3 text-gray-700 dark:text-gray-300 max-w-xl mx-auto sm:mx-0">
+                                            {user.bio}
+                                        </p>
                                     )}
-                                    {user.website && (
-                                        <a
-                                            href={user.website}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:underline"
+
+                                    {/* Location & website */}
+                                    <div className="mt-2 flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+                                        {user.location && (
+                                            <div className="flex items-center gap-1">
+                                                <MapPin className="h-4 w-4" />
+                                                <span>{user.location}</span>
+                                            </div>
+                                        )}
+                                        {user.website && (
+                                            <a
+                                                href={user.website}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:underline"
+                                            >
+                                                <LinkIcon className="h-4 w-4" />
+                                                <span>{user.website}</span>
+                                            </a>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-5 flex flex-wrap justify-center sm:justify-start gap-3">
+                                        <Button
+                                            className={`min-w-30 ${profileData.isFollowing
+                                                ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+                                                : "bg-red-500 hover:bg-red-600 text-white"
+                                                }`}
                                         >
-                                            <LinkIcon className="h-4 w-4" />
-                                            <span>{user.website}</span>
-                                        </a>
-                                    )}
-                                </div>
+                                            {profileData.isFollowing ? "Following" : "Follow"}
+                                        </Button>
 
-                                <div className="mt-5 flex flex-wrap justify-center sm:justify-start gap-3">
-                                    <Button
-                                        className={`min-w-30 ${profileData.isFollowing
-                                            ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
-                                            : "bg-red-500 hover:bg-red-600 text-white"
-                                            }`}
-                                    >
-                                        {profileData.isFollowing ? "Following" : "Follow"}
-                                    </Button>
+                                        <Button variant="outline" className="min-w-30">
+                                            Message
+                                        </Button>
 
-                                    <Button variant="outline" className="min-w-30">
-                                        Message
-                                    </Button>
+                                        <Button variant="ghost" size="icon">
+                                            <Users className="h-5 w-5" />
+                                        </Button>
 
-                                    <Button variant="ghost" size="icon">
-                                        <Users className="h-5 w-5" />
-                                    </Button>
-
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     )
             }
 
