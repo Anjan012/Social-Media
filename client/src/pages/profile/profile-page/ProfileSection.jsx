@@ -31,8 +31,6 @@ export const ProfileSection = ({ displayName = "@Anjan_012",
 
     }, []);
 
-    console.log(profileData)
-
     return (
         <>
 
