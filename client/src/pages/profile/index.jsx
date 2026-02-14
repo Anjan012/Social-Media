@@ -14,6 +14,7 @@ export function Profile() {
   const { id } = useParams();
     const [profileData, setProfileData] = useState([]);
     const [user, setUser] = useState([]);
+    const [posts, setPosts] = useState([]);
 
 
     useEffect(() => {
@@ -23,6 +24,7 @@ export function Profile() {
             const response = await axios.get(PROFILE_URL, { withCredentials: true });
             setProfileData(response.data);
             setUser(response.data.user);
+            setPosts(response.data.posts);
         };
 
         getProfile();
@@ -39,7 +41,7 @@ export function Profile() {
           <ProfileSection profileData={profileData} user={user}/>
           <ProfileTab />
           <PostBox  />
-          <ProfilePost />
+          <ProfilePost posts={posts} user={user} profileData={profileData}/>
         </div>
       </div >
     </>

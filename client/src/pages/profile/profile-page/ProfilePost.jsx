@@ -30,24 +30,13 @@ import { Image as ImageIcon, EllipsisVertical } from "lucide-react";
 export const ProfilePost = (
     {
         avatarUrl = "default_profile.jpg",
+        posts,
+        user,
+        profileData
     }
 ) => {
 
-    const [posts, setPosts] = useState([]);
-    const isOwnPost = true;
-
-
-    useEffect(() => {
-        const POST_URL = "/api/v1/userposts/";
-
-        const getUserPost = async () => {
-            const response = await axios.get(POST_URL, { withCredentials: true });
-            setPosts(response.data.post);
-        }
-
-        getUserPost();
-
-    }, []);
+    // const isOwnProfile = true;
 
     const toggleLike = async (postId) => {
     try {
@@ -58,7 +47,6 @@ export const ProfilePost = (
       console.log(error);
     }
   }
-
 
     const handleDeletePost = async (postId) => {
         try {
@@ -91,14 +79,14 @@ export const ProfilePost = (
                                 <div className="flex items-center gap-3">
                                     <Avatar className="h-10 w-10">
                                         <AvatarImage src={avatarUrl} alt="User" />
-                                        <AvatarFallback className="bg-red-500 text-white">AH</AvatarFallback>
+                                        <AvatarFallback className="bg-red-500 text-white">{user.username[0]}</AvatarFallback>
                                     </Avatar>
                                     <div>
                                         <p className="font-semibold text-gray-900 dark:text-white">
-                                            {post.createdBy.username}
+                                            {user.username}
                                         </p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            @{post.createdBy.fullname} • {post.createdAt}
+                                            @{user.fullname} • {post.createdAt}
                                         </p>
                                     </div>
                                 </div>
@@ -114,7 +102,7 @@ export const ProfilePost = (
                                         <Command className="rounded-lg border shadow-md">
                                             <CommandList>
                                                 {/* For your own post */}
-                                                {isOwnPost && (
+                                                {profileData.isOwnProfile && (
                                                     <CommandGroup>
                                                         <CommandItem
                                                             // onSelect={() => handleEditPost(post.id)}
@@ -168,10 +156,10 @@ export const ProfilePost = (
                                                         </span>
                                                     </CommandItem>
 
-                                                    {!isOwnPost && (
+                                                    {!profileData.isOwnProfile && (
                                                         <CommandItem className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm">
                                                             <UserMinus className="h-4 w-4" />
-                                                            <span>Unfollow {post.author.username}</span>
+                                                            <span>Unfollow {user.username}</span>
                                                         </CommandItem>
                                                     )}
                                                 </CommandGroup>
