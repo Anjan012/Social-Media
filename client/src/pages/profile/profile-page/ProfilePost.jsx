@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {

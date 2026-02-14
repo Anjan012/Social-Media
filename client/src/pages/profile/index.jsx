@@ -1,7 +1,6 @@
 import React from "react";
 import { Navbar } from "../../components/ui/shared/Navbar";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { ProfileSection } from "./profile-page/ProfileSection";
