@@ -24,7 +24,7 @@ const appRouter = createBrowserRouter([
     element: <SignIn />
   }, 
   {
-    path: '/profile/update',
+    path: '/profile/:id/update',
     element: <ProfileUpdate />
   }
 ]);

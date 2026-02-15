@@ -7,7 +7,7 @@ const router = express.Router();
 router.route('/signup').post(signUp);
 router.route('/signin').post(signIn);
 router.route('/profile/:id').get(isAuthenticated, getUserProfile);
-router.route('/profile/update').patch(isAuthenticated, updateProfile);
+router.route('/profile/:id/update').patch(isAuthenticated, updateProfile);
 router.route('/logout').get(logout);
 
 

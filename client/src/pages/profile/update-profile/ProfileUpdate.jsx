@@ -11,12 +11,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Camera, X, Loader2 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
+import { useParams } from "react-router-dom";
 
 export const ProfileUpdate = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         fullname: "",
-        username:"",
+        username: "",
         bio: "",
         location: "",
         website: "",
@@ -72,17 +73,17 @@ export const ProfileUpdate = () => {
 
         try {
             const response = await axios.patch("/api/user/profile/update", submitData, {
-              withCredentials: true,
+                withCredentials: true,
             });
 
-            if(response.status === 200){
+            if (response.status === 200) {
                 // Simulate success
-            setTimeout(() => {
-                toast("Profile updated successfully!");
-                navigate("/profile");
-            }, 1200);
+                setTimeout(() => {
+                    toast("Profile updated successfully!");
+                    navigate("/profile");
+                }, 1200);
             }
-            
+
         } catch (err) {
             console.error(err);
             alert("Failed to update profile");
@@ -91,34 +92,35 @@ export const ProfileUpdate = () => {
         }
     };
 
+    const { id } = useParams();
     useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get("http://localhost:3000/api/user/profile", {
-          withCredentials: true,
-        });
-        const userData = res.data.user;
-        // Fill form with current values
-        setFormData({
-          fullname: userData.fullname || "",
-          username: userData.username || "",
-          bio: userData.bio || "",
-          location: userData.location || "",
-          website: userData.website || "",
-        });
+        const fetchProfile = async () => {
+            try {
+                const res = await axios.get(`http://localhost:3000/api/user/profile/${id}`, {
+                    withCredentials: true,
+                });
+                const userData = res.data.user;
+                // Fill form with current values
+                setFormData({
+                    fullname: userData.fullname || "",
+                    username: userData.username || "",
+                    bio: userData.bio || "",
+                    location: userData.location || "",
+                    website: userData.website || "",
+                });
 
-        // // Set current profile picture preview (from backend URL)
-        // if (userData.profilePicture) {
-        //   setProfilePicPreview(userData.profilePicture); // assume it's a URL
-        // }
-      } catch (err) {
-        console.error("Failed to load profile", err);
-        toast.error("Could not load your profile data");
-      }
-    };
+                // // Set current profile picture preview (from backend URL)
+                // if (userData.profilePicture) {
+                //   setProfilePicPreview(userData.profilePicture); // assume it's a URL
+                // }
+            } catch (err) {
+                console.error("Failed to load profile", err);
+                toast.error("Could not load your profile data");
+            }
+        };
 
-    fetchProfile();
-  }, []);
+        fetchProfile();
+    }, []);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-950 sm:px-2 lg:px-8">

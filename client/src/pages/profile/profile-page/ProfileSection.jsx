@@ -97,7 +97,7 @@ export const ProfileSection = ({
                                         <Button
                                             variant="outline"
                                             className="min-w-35 border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700"
-                                            onClick={() => navigate("/profile/update")} // or open modal / go to edit page
+                                            onClick={() => navigate(`/profile/${user._id}/update`)} // or open modal / go to edit page
                                         >
                                             Edit Profile
                                         </Button>
