@@ -1,5 +1,3 @@
-// pages/ProfileUpdate.tsx  (or wherever you place it)
-
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -128,7 +126,7 @@ export const ProfileUpdate = () => {
             <div className="max-w-3xl mx-auto">
                 <Card className="border border-gray-200 dark:border-gray-800 shadow-lg overflow-hidden">
                     {/* Cover / Banner Area */}
-                    <div className="relative h-48 sm:h-64 bg-gradient-to-r from-red-400/30 to-purple-500/30">
+                    <div className="relative h-48 sm:h-64 bg-linear-to-r from-red-400/30 to-purple-500/30">
                         {coverPic && (
                             <img
                                 src={coverPic}
@@ -173,9 +171,9 @@ export const ProfileUpdate = () => {
                         <div className="absolute -top-16 left-6 sm:left-8">
                             <div className="relative group">
                                 <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 border-white dark:border-gray-950 shadow-2xl">
-                                    <AvatarImage src={profilePic || "/default-avatar.png"} alt="Profile" />
+                                    <AvatarImage src={profilePic || "default-avatar.png"} alt="Profile" />
                                     <AvatarFallback className="bg-red-500 text-white text-4xl">
-                                        {formData.fullname?.[0] || "?"}
+                                        {formData.username?.[0] || "?"}
                                     </AvatarFallback>
                                 </Avatar>
 
@@ -244,7 +242,7 @@ export const ProfileUpdate = () => {
                                     value={formData.bio}
                                     onChange={handleInputChange}
                                     placeholder="Write something about yourself..."
-                                    className="min-h-[100px] focus:border-red-500 focus:ring-red-500"
+                                    className="min-h-25 focus:border-red-500 focus:ring-red-500"
                                 />
                             </div>
 
@@ -285,7 +283,7 @@ export const ProfileUpdate = () => {
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="bg-red-600 hover:bg-red-700 min-w-[140px]"
+                                    className="bg-red-600 hover:bg-red-700 min-w-35"
                                 >
                                     {isLoading ? (
                                         <>
