@@ -29,6 +29,8 @@ export const ProfileUpdate = () => {
 
     const profilePicRef = useRef(null);
     const coverPicRef = useRef(null);
+    const { id } = useParams();
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -80,7 +82,7 @@ export const ProfileUpdate = () => {
                 // Simulate success
                 setTimeout(() => {
                     toast("Profile updated successfully!");
-                    navigate("/profile");
+                    navigate(`/profile/${id}`);
                 }, 1200);
             }
 
@@ -92,7 +94,6 @@ export const ProfileUpdate = () => {
         }
     };
 
-    const { id } = useParams();
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -277,7 +278,7 @@ export const ProfileUpdate = () => {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => navigate("/profile")}
+                                    onClick={() => navigate(`/profile/${id}`)}
                                 >
                                     Cancel
                                 </Button>
