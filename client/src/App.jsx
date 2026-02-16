@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './App.css';
 import { Home } from "./pages/Home";
 import { Profile } from "./pages/profile/index";
-import {ProfileUpdate} from "./pages/profile/update-profile/ProfileUpdate";
+import { ProfileUpdate } from "./pages/profile/update-profile/ProfileUpdate";
 import { AuthProvider } from "./context/AuthContext";
 import SearchPage from "./pages/search/SearchPage";
 
@@ -14,17 +14,17 @@ const appRouter = createBrowserRouter([
     element: <Home />
   },
   {
-    path:'/profile/:id',
+    path: '/profile/:id',
     element: <Profile />
   },
   {
-    path:'/signup',
+    path: '/signup',
     element: <SignUp />
   },
   {
-    path:'/signin',
+    path: '/signin',
     element: <SignIn />
-  }, 
+  },
   {
     path: '/profile/:id/update',
     element: <ProfileUpdate />
@@ -40,12 +40,9 @@ function App() {
 
   return (
     <>
-        <AuthProvider>
-    
-      <RouterProvider router={appRouter}/>
-    </AuthProvider>
-
-
+      <AuthProvider>
+        <RouterProvider router={appRouter} />
+      </AuthProvider>
     </>
   )
 }

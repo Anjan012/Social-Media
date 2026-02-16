@@ -91,14 +91,14 @@ export const Navbar = () => {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Avatar>
-                                        <AvatarImage src="default_profile.jpg" />
+                                        <AvatarImage src={authUser.profilePicture || "default_profile.jpg"}  />
                                     </Avatar>
                                 </PopoverTrigger>
                                 <PopoverContent className='w-80'>
                                     <div className="flex gap-5 space-y-2">
                                         <Avatar className="cursor-pointer" >
                                             <AvatarImage 
-                                            // src={authUser.profilePicture || "default_profile.jpg"} 
+                                            src={authUser.profilePicture || "default_profile.jpg"} 
                                             />
                                         </Avatar>
                                         <div>
