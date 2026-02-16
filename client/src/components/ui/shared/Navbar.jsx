@@ -63,28 +63,15 @@ export const Navbar = () => {
                             </Link>
                         </div>
 
-                        <div className="hidden md:flex flex-1 max-w-md mx-4 lg:mx-12 justify-center">
-                            <div className="relative w-full max-w-lg">
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 border border-gray-300 focus:border-red-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-300 transition-all text-gray-800 placeholder-gray-500"
-                                />
-                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
 
                         <div className="flex items-center gap-1 sm:gap-2 md:gap-6">
+                        
 
-                            <button className="md:hidden p-2 rounded-full hover:bg-red-50 text-gray-700 hover:text-red-600 transition-colors focus:outline-none">
+                            <Link to={'/search'} className="p-2 rounded-full hover:bg-red-50 text-gray-700 hover:text-red-600 transition-colors focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
-                            </button>
+                            </Link>
 
                             <Link to="/"
                                 className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
@@ -99,6 +86,7 @@ export const Navbar = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </a>
+                            
 
                             <Popover>
                                 <PopoverTrigger asChild>
