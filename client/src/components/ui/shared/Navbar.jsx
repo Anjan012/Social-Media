@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,26 +11,34 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../context/AuthContext';
+import { useContext } from 'react';
 
 export const Navbar = () => {
 
-    const [user, setUser] = useState([]);
+    // const [user, setUser] = useState([]);
     const navigate = useNavigate();
+    const { authUser } = useContext(AuthContext);
+    if (authUser === null) {
+    return (
+      <div className="h-14 animate-pulse bg-gray-100" />
+    );
+  }
 
-    const PROFILE_URL = "/api/user/profile";
+
+    // const PROFILE_URL = "/api/user/profile";
 
 
-    const getProfile = async () => {
-        const response = await axios.get(PROFILE_URL, { withCredentials: true });
-        setUser(response.data.user);
-    };
+    // const getProfile = async () => {
+    //     const response = await axios.get(PROFILE_URL, { withCredentials: true });
+    //     setUser(response.data.user);
+    // };
 
     const handleLogout = async () => {
         try {
             const LOGOUT_URL = "/api/user/logout";
 
             const response = await axios.get(LOGOUT_URL, { withCredentials: true });
-            console.log(user)
 
             if (response.status === 200) {
                 toast("Logout Successful");
@@ -38,7 +46,8 @@ export const Navbar = () => {
         } catch (error) {
             console.log(error.message);
         }
-    }
+    };
+
 
     return (
         <>
@@ -46,7 +55,7 @@ export const Navbar = () => {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-14 sm:h-16 items-center justify-between">
 
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                             <Link to="/" className="flex items-center gap-2">
                                 <span className="text-2xl sm:text-3xl font-bold tracking-tight text-red-500 hover:text-red-600 transition-colors">
                                     MyApp
@@ -93,25 +102,27 @@ export const Navbar = () => {
 
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <Avatar onClick={getProfile}>
+                                    <Avatar>
                                         <AvatarImage src="default_profile.jpg" />
                                     </Avatar>
                                 </PopoverTrigger>
                                 <PopoverContent className='w-80'>
                                     <div className="flex gap-5 space-y-2">
                                         <Avatar className="cursor-pointer" >
-                                            <AvatarImage src={user.image || "default_profile.jpg"} />
+                                            <AvatarImage 
+                                            // src={authUser.profilePicture || "default_profile.jpg"} 
+                                            />
                                         </Avatar>
                                         <div>
-                                            <h4 className="font-medium">{user.username}</h4>
-                                            <p className="text-sm text-muted-foreground">{user?.bio?.slice(0, 20) + "..."}</p>
+                                            <h4 className="font-medium">{authUser.username}</h4>
+                                            <p className="text-sm text-muted-foreground">{authUser?.bio?.slice(0, 20) + "..."}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col text-gray-600 my-2">
                                         <div className="flex w-fit items-center gap-2 cursor-pointer">
                                             <User2 />
                                             <Link>
-                                                <Button variant="link" onClick={() => navigate(`/profile/${user._id}`)}>View Profile</Button>
+                                                <Button variant="link" onClick={() => navigate(`/profile/${authUser._id}`)}>View Profile</Button>
                                             </Link>
                                         </div>
                                         <div className="flex w-fit items-center gap-2 cursor-pointer">

@@ -79,6 +79,8 @@ export const Home = ({
     }
   }
 
+  // dummy data
+
   return (
     <>
       <Navbar />

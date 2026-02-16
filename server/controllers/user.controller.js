@@ -137,6 +137,25 @@ export const logout = async (req, res) => {
   }
 };
 
+export const getMe = async (req, res) => {
+  const loggedInId = req.id;
+
+  const user = await User.findById(loggedInId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found!",
+        success: false,
+      });
+    };
+
+    return res.status(200).json({
+      success: true,
+      user
+    })
+  
+}
+
 export const updateProfile = async (req, res) => {
   try {
     const { username, fullname, bio, location, website, dob } = req.body;
