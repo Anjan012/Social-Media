@@ -276,35 +276,59 @@ export const followUser = async (req, res) => {
     const userId = req.id;
     const strangerId = req.params.id;
 
-    const user = await User.findById(strangerId);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "no user found",
-        status: false,
+    // Prevent self-follow
+    if (userId === strangerId) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot follow yourself",
       });
     }
-    console.log(user);
 
-    const isFollower = user.followers.includes(userId);
+    const stranger = await User.findById(strangerId);
+    const user = await User.findById(userId);
 
-    if(isFollower) {
-      user.followers.pull(userId);
-    } else {
-      user.followers.addToSet(userId);
-      res.status(200).json({
-      success:true
-    })
+    if (!stranger || !user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    await user.save();
+    const isFollower = stranger.followers.includes(userId);
+
+    if (isFollower) {
+      // UNFOLLOW
+      stranger.followers.pull(userId);
+      user.following.pull(strangerId);
+
+      await stranger.save();
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Unfollowed successfully",
+      });
+
+    } else {
+      // FOLLOW
+      stranger.followers.addToSet(userId);
+      user.following.addToSet(strangerId);
+
+      await stranger.save();
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Followed successfully",
+      });
+    }
 
   } catch (error) {
-    res.status(500).json({
-      success:false,
-      message:"Internal Server Error"
-    });
     console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
   }
+};
 
-}
