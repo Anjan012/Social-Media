@@ -270,3 +270,33 @@ export const searchUser = async (req, res) => {
     });
   }
 };
+
+export const followUser = async (req, res) => {
+  try {
+    const userId = req.id;
+    const strangerId = req.params.id;
+
+    const user = User.findById(strangerId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "no user found",
+        status: false,
+      });
+    }
+
+    const isFollowing = user.following.includes(userId);
+
+    if(isFollowing) {
+      user.following.pull(userId);
+    } else {
+      user.following.addToSet(userId);
+    }
+
+    await user.save();
+
+  } catch (error) {
+    console.log(error);
+  }
+
+}

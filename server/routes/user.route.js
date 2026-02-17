@@ -1,5 +1,5 @@
 import express from "express";
-import { signIn, signUp, logout, updateProfile, getUserProfile, getMe, searchUser } from "../controllers/user.controller.js";
+import { signIn, signUp, logout, updateProfile, getUserProfile, getMe, searchUser, followUser } from "../controllers/user.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
 
 const router = express.Router();
@@ -13,6 +13,7 @@ router.route('/search').get((req,res,next)=>{
 //   console.log("SEARCH ROUTE HIT");
   next();
 }, isAuthenticated, searchUser);
+router.route('/follow').post(isAuthenticated, followUser);
 
 router.route('/logout').get(logout);
 
