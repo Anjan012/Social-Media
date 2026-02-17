@@ -97,7 +97,7 @@ export const signIn = async (req, res) => {
         // sameSite: "strict", // CSRF protection
         // secure: true,
         sameSite: "lax",
-        secure: false
+        secure: false,
       })
       .json({
         message: `Welcome back, ${user.username}`,
@@ -121,7 +121,7 @@ export const logout = async (req, res) => {
       .clearCookie("token", {
         httpOnly: true,
         sameSite: "lax",
-        secure: false
+        secure: false,
         // sameSite: "strict",
         // secure: true, // enable this in production (HTTPS)
       })
@@ -142,19 +142,18 @@ export const getMe = async (req, res) => {
 
   const user = await User.findById(loggedInId).select("-password");
 
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found!",
-        success: false,
-      });
-    };
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found!",
+      success: false,
+    });
+  }
 
-    return res.status(200).json({
-      success: true,
-      user
-    })
-  
-}
+  return res.status(200).json({
+    success: true,
+    user,
+  });
+};
 
 export const updateProfile = async (req, res) => {
   try {
@@ -212,9 +211,11 @@ export const getUserProfile = async (req, res) => {
         message: "User not found!",
         success: false,
       });
-    };
+    }
 
-    const posts = await Post.find({createdBy: profileUserId}).sort({createdAt: -1});
+    const posts = await Post.find({ createdBy: profileUserId }).sort({
+      createdAt: -1,
+    });
 
     const isOwnProfile = loggedInUserId === profileUserId;
 
@@ -225,12 +226,44 @@ export const getUserProfile = async (req, res) => {
       user,
       posts,
       isOwnProfile,
-      isFollowing
+      isFollowing,
     });
   } catch (error) {
     res.status(500).json({
       message: "Internal Server Error",
       success: false,
+    });
+  }
+};
+
+export const searchUser = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || query.trim === "") {
+      res.status(200).json({
+        success: true,
+        user: [],
+      });
+
+      const users = await User.find({
+        $or: [
+          { username: { $regex: query, $options: "i" } },
+          { fullname: { $regex: query, $options: "i" } },
+        ],
+      })
+        .select("-password")
+        .limit(10);
+
+      return res.status(200).json({
+        success: true,
+        users,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
     });
   }
 };
