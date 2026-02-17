@@ -125,7 +125,7 @@ const SearchPage = () => {
                                         ) : (
                                             <div className="w-14 h-14 rounded-full bg-linear-to-br from-red-500 to-red-600 
                                     flex items-center justify-center text-white text-xl font-bold">
-                                                {user.fullname?.[0] || user.username[0].toUpperCase()}
+                                                {user.username?.[0] || user.fullname[0].toUpperCase()}
                                             </div>
                                         )}
                                     </div>
