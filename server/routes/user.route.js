@@ -13,7 +13,7 @@ router.route('/search').get((req,res,next)=>{
 //   console.log("SEARCH ROUTE HIT");
   next();
 }, isAuthenticated, searchUser);
-router.route('/follow').post(isAuthenticated, followUser);
+router.route('/follow/:id').post(isAuthenticated, followUser);
 
 router.route('/logout').get(logout);
 

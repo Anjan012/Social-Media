@@ -276,7 +276,7 @@ export const followUser = async (req, res) => {
     const userId = req.id;
     const strangerId = req.params.id;
 
-    const user = User.findById(strangerId);
+    const user = await User.findById(strangerId);
 
     if (!user) {
       return res.status(404).json({
@@ -284,16 +284,25 @@ export const followUser = async (req, res) => {
         status: false,
       });
     }
+    console.log(user);
 
-    const isFollowing = user.following.includes(userId);
+    console.log("controller working");
+    const isFollower = user.followers.includes(userId);
+    // console.log("Db call working");
 
-    if(isFollowing) {
-      user.following.pull(userId);
+    if(isFollower) {
+      user.followers.pull(userId);
     } else {
-      user.following.addToSet(userId);
+      user.followers.addToSet(userId);
+      res.status(200).json({
+      success:true
+    })
     }
+    // console.log("Db call saving");
 
     await user.save();
+
+    
 
   } catch (error) {
     console.log(error);

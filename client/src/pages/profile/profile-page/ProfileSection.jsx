@@ -3,7 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "../../../components/ui/button";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
+import { toast } from "sonner";
 
 export const ProfileSection = ({
     avatarUrl = "default_profile.jpg",
@@ -12,6 +13,28 @@ export const ProfileSection = ({
 }) => {
 
     const navigate = useNavigate();
+
+    const handleFollow = async (id) => {
+        try {
+            const URL = `/api/user/follow/${id}`;
+
+            const res = await axios.post(
+                URL,
+                {},
+                { withCredentials: true }
+            );
+
+            console.log(res);
+
+            if (res.status === 200) {
+                toast(`You are following ${user.username}`);
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
 
     return (
         <>
@@ -183,6 +206,7 @@ export const ProfileSection = ({
 
                                     <div className="mt-5 flex flex-wrap justify-center sm:justify-start gap-3">
                                         <Button
+                                            onClick={() => { handleFollow(user._id) }}
                                             className={`min-w-30 ${profileData.isFollowing
                                                 ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
                                                 : "bg-red-500 hover:bg-red-600 text-white"
