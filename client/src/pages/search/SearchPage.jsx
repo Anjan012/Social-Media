@@ -2,80 +2,47 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
-// Mock data (replace with real API later)
-const mockUsers = [
-    {
-        _id: '1',
-        username: 'anjan_thimi',
-        fullname: 'Anjan Shrestha',
-        bio: 'Building cool stuff with MERN | Coffee addict ☕ | Nepal 🇳🇵',
-        profilePicture: 'https://ui-avatars.com/api/?name=Anjan+Shrestha&background=0D8ABC&color=fff',
-    },
-    {
-        _id: '2',
-        username: 'sara_dev',
-        fullname: 'Sara Gurung',
-        bio: 'Frontend developer • React & Tailwind lover • Always learning',
-        profilePicture: 'https://ui-avatars.com/api/?name=Sara+Gurung&background=FF6B6B&color=fff',
-    },
-    {
-        _id: '3',
-        username: 'rajesh_code',
-        fullname: 'Rajesh Tamang',
-        bio: 'Full-stack | Node.js | MongoDB | Open source contributor',
-        profilePicture: '',
-    },
-    {
-        _id: '4',
-        username: 'priya_art',
-        fullname: 'Priya Maharjan',
-        bio: 'Digital artist • UI/UX enthusiast • Sharing my sketches 🎨',
-        profilePicture: 'https://ui-avatars.com/api/?name=Priya+Maharjan&background=4ECDC4&color=fff',
-    },
-];
+import { useEffect } from 'react';
 
 const SearchPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false)
 
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    };
 
-    // const handleSearch = async (e) => {
-
-    //     const query = e.target.value.trim().toLowerCase();
-    //     setSearchQuery(query);
-
-    //     console.log(query)
-
-    //     const res = await axios.get(`/api/users/search?query=${query}`, {
-    //         withCredentials: true
-    //     });
-
-    //     if (query.length === 0) {
-    //         setResults(res.data.users);
-    //         return;
-    //     }
-
-    //     // Simple mock filter
-    //     const filtered = mockUsers.filter(
-    //         (user) =>
-    //             user.username.toLowerCase().includes(query) ||
-    //             (user.fullname && user.fullname.toLowerCase().includes(query))
-    //     );
-
-    //     setResults(filtered);
-    // };
 
     useEffect(() => {
-        if (query.trim().length === 0) {
-            setSearchResults([]);
-            return;
-        }
+        const delayDebounce = setTimeout(async () => {
 
-        searchUsers(query);
+            if (!searchQuery.trim()) {
+                setSearchResults([]);
+                return;
+            }
 
-    }, [query]);
+            try {
+                setLoading(true);
+
+                const res = await axios.get(
+                    `/api/user/search?query=${searchQuery}`,
+                    { withCredentials: true }
+                );
+
+                setSearchResults(res.data.users);
+
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+
+        }, 500);
+
+        return () => clearTimeout(delayDebounce);
+
+    }, [searchQuery]);
 
 
     return (
@@ -118,7 +85,7 @@ const SearchPage = () => {
 
                 {/* Results / Messages */}
                 <div className="space-y-4">
-                    {searchQuery.length > 0 && results.length === 0 && (
+                    {searchQuery.length > 0 && searchResults.length === 0 && (
                         <p className="text-center text-gray-500 dark:text-gray-400 py-12 text-lg">
                             No users found for "{searchQuery}"
                         </p>
@@ -130,16 +97,18 @@ const SearchPage = () => {
                         </p>
                     )}
 
+
+
                     {/* User Cards */}
-                    {results.length > 0 && (
+                    {searchResults.length > 0 && (
                         <div className="grid gap-4">
-                            {results.map((user) => (
+                            {searchResults.map((user) => (
                                 <Link
                                     key={user._id}
                                     to={`/profile/${user._id}`} // or /users/${user.username}
                                     className="group flex items-center gap-4 p-4 bg-white dark:bg-gray-800 
                            rounded-xl border border-gray-200 dark:border-gray-700 
-                           hover:border-blue-500 transition-all duration-200 
+                           hover:border-red-500 transition-all duration-200 
                            hover:shadow-md"
                                 >
                                     {/* Avatar */}
@@ -154,9 +123,9 @@ const SearchPage = () => {
                                                 }}
                                             />
                                         ) : (
-                                            <div className="w-14 h-14 rounded-full bg-linear-to-br from-blue-500 to-purple-600 
+                                            <div className="w-14 h-14 rounded-full bg-linear-to-br from-red-500 to-red-600 
                                     flex items-center justify-center text-white text-xl font-bold">
-                                                {user.fullname?.[0] || user.username[0].toUpperCase()}
+                                                {user.username?.[0] || user.fullname[0].toUpperCase()}
                                             </div>
                                         )}
                                     </div>
@@ -164,7 +133,7 @@ const SearchPage = () => {
                                     {/* User Info */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-baseline gap-2">
-                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate group-hover:text-red-600 dark:group-hover:text-red-400">
                                                 @{user.username}
                                             </h3>
                                             {user.fullname && (

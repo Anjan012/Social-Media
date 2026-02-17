@@ -238,13 +238,15 @@ export const getUserProfile = async (req, res) => {
 
 export const searchUser = async (req, res) => {
   try {
+    console.log("SEARCH CONTROLLER HIT");
     const { query } = req.query;
 
-    if (!query || query.trim === "") {
-      res.status(200).json({
+    if (!query || query.trim() === "") {
+      return res.status(200).json({
         success: true,
         user: [],
       });
+    }
 
       const users = await User.find({
         $or: [
@@ -255,11 +257,12 @@ export const searchUser = async (req, res) => {
         .select("-password")
         .limit(10);
 
+      console.log("DB QUERY SUCCESS");
+
       return res.status(200).json({
         success: true,
         users,
       });
-    }
   } catch (error) {
     return res.status(500).json({
       success: false,

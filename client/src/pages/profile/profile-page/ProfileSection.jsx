@@ -24,9 +24,9 @@ export const ProfileSection = ({
                             <div className="shrink-0 mx-auto sm:mx-0">
                                 <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 lg:mt-12 border-white dark:border-gray-900 shadow-xl">
                                     <AvatarImage src={avatarUrl} alt="user" />
-                                    <AvatarFallback className="text-4xl bg-red-500 text-white">
+                                    <AvatarFallback className="text-4xl bg-red-500 text-white font-bold">
                                         {
-                                            user.username[0]
+                                            user.username?.[0].toUpperCase()
                                         }
                                     </AvatarFallback>
                                 </Avatar>
@@ -116,7 +116,7 @@ export const ProfileSection = ({
                                         <AvatarImage src={avatarUrl} alt="user" />
                                         <AvatarFallback className="text-4xl bg-red-500 text-white">
                                             {
-                                                // user.username[0]
+                                                user.username?.[0].toUpperCase()
                                             }
                                         </AvatarFallback>
                                     </Avatar>
