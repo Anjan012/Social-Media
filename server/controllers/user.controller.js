@@ -286,9 +286,7 @@ export const followUser = async (req, res) => {
     }
     console.log(user);
 
-    console.log("controller working");
     const isFollower = user.followers.includes(userId);
-    // console.log("Db call working");
 
     if(isFollower) {
       user.followers.pull(userId);
@@ -298,13 +296,14 @@ export const followUser = async (req, res) => {
       success:true
     })
     }
-    // console.log("Db call saving");
 
     await user.save();
 
-    
-
   } catch (error) {
+    res.status(500).json({
+      success:false,
+      message:"Internal Server Error"
+    });
     console.log(error);
   }
 
