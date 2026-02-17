@@ -15,6 +15,7 @@ const isAuthenticated = (req, res, next) => {
     // jwt.verify() either: returns a decoded payload, or throws an error (which you already catch) no need to add (if(!decodeToken)) check 
 
     req.id = decodeToken.userId;
+    // console.log("Auth middleware running");
 
     next();
 
