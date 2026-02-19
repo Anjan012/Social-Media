@@ -315,7 +315,7 @@ export const followUser = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        message: "Followed successfully",
+        message: "You are following " + stranger.username,
       });
     }
   } catch (error) {

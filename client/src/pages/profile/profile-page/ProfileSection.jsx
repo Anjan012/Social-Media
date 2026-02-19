@@ -24,10 +24,8 @@ export const ProfileSection = ({
                 { withCredentials: true }
             );
 
-            console.log(res);
-
             if (res.status === 200) {
-                toast(`You are following ${user.username}`);
+                toast(res.data.message);
             }
 
         } catch (error) {
