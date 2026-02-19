@@ -1,5 +1,5 @@
 // import React, { useState } from 'react';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
     Popover,
@@ -20,10 +20,10 @@ export const Navbar = () => {
     const navigate = useNavigate();
     const { authUser } = useContext(AuthContext);
     if (authUser === null) {
-    return (
-      <div className="h-14 animate-pulse bg-gray-100" />
-    );
-  }
+        return (
+            <div className="h-14 animate-pulse bg-gray-100" />
+        );
+    }
 
 
     // const PROFILE_URL = "/api/user/profile";
@@ -65,7 +65,7 @@ export const Navbar = () => {
 
 
                         <div className="flex items-center gap-1 sm:gap-2 md:gap-6">
-                        
+
 
                             <Link to={'/search'} className="p-2 rounded-full hover:bg-red-50 text-gray-700 hover:text-red-600 transition-colors focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -86,19 +86,24 @@ export const Navbar = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </a>
-                            
+
 
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Avatar>
-                                        <AvatarImage src={authUser.profilePicture || "default_profile.jpg"}  />
+                                        {/* <AvatarImage src={authUser.profilePicture || "default_profile.jpg"}  /> */}
+                                        <AvatarFallback className="text-2xl bg-red-500 text-white font-bold">
+                                            {
+                                                authUser.username?.[0].toUpperCase()
+                                            }
+                                        </AvatarFallback>
                                     </Avatar>
                                 </PopoverTrigger>
                                 <PopoverContent className='w-80'>
                                     <div className="flex gap-5 space-y-2">
                                         <Avatar className="cursor-pointer" >
-                                            <AvatarImage 
-                                            src={authUser.profilePicture || "default_profile.jpg"} 
+                                            <AvatarImage
+                                                src={authUser.profilePicture || "default_profile.jpg"}
                                             />
                                         </Avatar>
                                         <div>
