@@ -5,12 +5,21 @@ import { Link as LinkIcon, MapPin, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
 
 export const ProfileSection = ({
     avatarUrl = "default_profile.jpg",
     profileData,
     user
 }) => {
+
+    const [isFollowing, setIsFollowing] = useState(profileData.isFollowing);
+
+    useEffect(() => {
+        setIsFollowing(profileData.isFollowing)
+    }, [profileData.isFollowing]);
+
+    console.log(isFollowing);
 
     const navigate = useNavigate();
 
@@ -26,13 +35,13 @@ export const ProfileSection = ({
 
             if (res.status === 200) {
                 toast(res.data.message);
+                setIsFollowing((prev)=> !prev);
             }
 
         } catch (error) {
             console.log(error);
         }
     };
-
 
     return (
         <>
@@ -205,12 +214,12 @@ export const ProfileSection = ({
                                     <div className="mt-5 flex flex-wrap justify-center sm:justify-start gap-3">
                                         <Button
                                             onClick={() => { handleFollow(user._id) }}
-                                            className={`min-w-30 ${profileData.isFollowing
+                                            className={`min-w-30 ${isFollowing
                                                 ? "bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
                                                 : "bg-red-500 hover:bg-red-600 text-white"
                                                 }`}
                                         >
-                                            {profileData.isFollowing ? "Following" : "Follow"}
+                                            {isFollowing ? "Following" : "Follow"}
                                         </Button>
 
                                         <Button variant="outline" className="min-w-30">
