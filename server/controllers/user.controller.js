@@ -238,7 +238,6 @@ export const getUserProfile = async (req, res) => {
 
 export const searchUser = async (req, res) => {
   try {
-    console.log("SEARCH CONTROLLER HIT");
     const { query } = req.query;
 
     if (!query || query.trim() === "") {
@@ -248,21 +247,19 @@ export const searchUser = async (req, res) => {
       });
     }
 
-      const users = await User.find({
-        $or: [
-          { username: { $regex: query, $options: "i" } },
-          { fullname: { $regex: query, $options: "i" } },
-        ],
-      })
-        .select("-password")
-        .limit(10);
+    const users = await User.find({
+      $or: [
+        { username: { $regex: query, $options: "i" } },
+        { fullname: { $regex: query, $options: "i" } },
+      ],
+    })
+      .select("-password")
+      .limit(10);
 
-      console.log("DB QUERY SUCCESS");
-
-      return res.status(200).json({
-        success: true,
-        users,
-      });
+    return res.status(200).json({
+      success: true,
+      users,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -308,7 +305,6 @@ export const followUser = async (req, res) => {
         success: true,
         message: "Unfollowed successfully",
       });
-
     } else {
       // FOLLOW
       stranger.followers.addToSet(userId);
@@ -322,7 +318,6 @@ export const followUser = async (req, res) => {
         message: "Followed successfully",
       });
     }
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -331,4 +326,3 @@ export const followUser = async (req, res) => {
     });
   }
 };
-
