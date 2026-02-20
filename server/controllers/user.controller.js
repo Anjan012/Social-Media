@@ -152,6 +152,7 @@ export const getMe = async (req, res) => {
   return res.status(200).json({
     success: true,
     user,
+    message: "User profile fetched successfully!",
   });
 };
 
@@ -227,6 +228,7 @@ export const getUserProfile = async (req, res) => {
       posts,
       isOwnProfile,
       isFollowing,
+      message: "User profile fetched successfully!",
     });
   } catch (error) {
     res.status(500).json({
@@ -259,6 +261,7 @@ export const searchUser = async (req, res) => {
     return res.status(200).json({
       success: true,
       users,
+      message: "User search results fetched successfully!",
     });
   } catch (error) {
     return res.status(500).json({
