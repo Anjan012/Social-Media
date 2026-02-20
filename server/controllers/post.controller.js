@@ -62,6 +62,7 @@ export const getAllPost = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      message: "Posts fetched successfully!",
       posts,
     });
   } catch (error) {
@@ -97,6 +98,7 @@ export const getPostById = async (req, res) => {
     return res.status(200).json({
       success: true,
       post,
+      message: "Post fetched successfully!",
     });
   } catch (error) {
     console.log(`Error while fetching post: ${error}`);
@@ -164,6 +166,7 @@ export const getUserPost = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      message: "Posts fetched successfully!",
       post,
     });
   } catch (error) {
