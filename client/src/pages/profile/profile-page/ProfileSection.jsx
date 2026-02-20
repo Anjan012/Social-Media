@@ -14,12 +14,12 @@ export const ProfileSection = ({
 }) => {
 
     const [isFollowing, setIsFollowing] = useState(profileData.isFollowing);
+    const [followerCount, setFollowerCount] = useState(user.followers?.length || 0)
 
     useEffect(() => {
-        setIsFollowing(profileData.isFollowing)
-    }, [profileData.isFollowing]);
-
-    console.log(isFollowing);
+        setIsFollowing(profileData.isFollowing);
+        setFollowerCount(user.followers?.length || 0);
+    }, [profileData.isFollowing, user.followers]);
 
     const navigate = useNavigate();
 
@@ -36,12 +36,14 @@ export const ProfileSection = ({
             if (res.status === 200) {
                 toast(res.data.message);
                 setIsFollowing((prev)=> !prev);
+                setFollowerCount((prev) => isFollowing ? prev - 1 : prev + 1);
             }
 
         } catch (error) {
             console.log(error);
         }
     };
+
 
     return (
         <>
@@ -171,7 +173,7 @@ export const ProfileSection = ({
                                         </div>
                                         <div className="flex items-center gap-1.5">
                                             <span className="font-bold text-gray-900 dark:text-white">
-                                                {user.followers?.length || 0}
+                                                {followerCount}
                                             </span>
                                             <span className="text-gray-500 dark:text-gray-400">Followers</span>
                                         </div>
