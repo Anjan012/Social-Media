@@ -5,7 +5,6 @@ import './App.css';
 import { Home } from "./pages/Home";
 import { Profile } from "./pages/profile/index";
 import { ProfileUpdate } from "./pages/profile/update-profile/ProfileUpdate";
-import { AuthProvider } from "./context/AuthContext";
 import SearchPage from "./pages/search/SearchPage";
 
 const appRouter = createBrowserRouter([
@@ -39,11 +38,7 @@ const appRouter = createBrowserRouter([
 function App() {
 
   return (
-    <>
-      <AuthProvider>
-        <RouterProvider router={appRouter} />
-      </AuthProvider>
-    </>
+    <RouterProvider router={appRouter} />
   )
 }
 
