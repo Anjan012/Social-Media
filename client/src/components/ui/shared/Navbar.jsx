@@ -35,7 +35,7 @@ export const Navbar = () => {
         try {
             const LOGOUT_URL = "/api/user/logout";
 
-            const response = await axios.get(LOGOUT_URL, { withCredentials: true });
+            const response = await axios.delete(LOGOUT_URL, { withCredentials: true });
 
             if (response.status === 200) {
                 setAuthUser(null);
