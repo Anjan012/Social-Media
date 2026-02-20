@@ -17,7 +17,7 @@ export function Profile() {
 
 
     useEffect(() => {
-        const PROFILE_URL = `/api/user/profile/${id}`;
+        const PROFILE_URL = `/api/v1/users/${id}`;
 
         const getProfile = async () => {
             const response = await axios.get(PROFILE_URL, { withCredentials: true });

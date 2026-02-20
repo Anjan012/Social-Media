@@ -25,7 +25,7 @@ export const ProfileSection = ({
 
     const handleFollow = async (id) => {
         try {
-            const URL = `/api/user/follow/${id}`;
+            const URL = `/api/v1/users/${id}/follow`;
 
             const res = await axios.post(
                 URL,
