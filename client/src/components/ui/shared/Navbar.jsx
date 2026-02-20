@@ -33,7 +33,7 @@ export const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            const LOGOUT_URL = "/api/user/logout";
+            const LOGOUT_URL = "/api/v1/sessions";
 
             const response = await axios.delete(LOGOUT_URL, { withCredentials: true });
 

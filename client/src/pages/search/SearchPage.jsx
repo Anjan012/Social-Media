@@ -26,7 +26,7 @@ const SearchPage = () => {
                 setLoading(true);
 
                 const res = await axios.get(
-                    `/api/user/search?query=${searchQuery}`,
+                    `/api/v1/users/search?query=${searchQuery}`,
                     { withCredentials: true }
                 );
 
