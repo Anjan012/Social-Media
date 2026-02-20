@@ -12,27 +12,22 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
-import { useContext } from 'react';
+import { useContext} from 'react';
 
 export const Navbar = () => {
 
-    // const [user, setUser] = useState([]);
+
     const navigate = useNavigate();
-    const { authUser } = useContext(AuthContext);
-    if (authUser === null) {
+    const { authUser, setAuthUser, authLoading } = useContext(AuthContext);
+
+    console.log("Navbar authUser:", authUser);
+
+    if (authLoading) {
         return (
-            <div className="h-14 animate-pulse bg-gray-100" />
+            <div className="h-16 bg-gray-200 animate-pulse"></div>
         );
     }
 
-
-    // const PROFILE_URL = "/api/user/profile";
-
-
-    // const getProfile = async () => {
-    //     const response = await axios.get(PROFILE_URL, { withCredentials: true });
-    //     setUser(response.data.user);
-    // };
 
     const handleLogout = async () => {
         try {
@@ -41,12 +36,18 @@ export const Navbar = () => {
             const response = await axios.get(LOGOUT_URL, { withCredentials: true });
 
             if (response.status === 200) {
+                setAuthUser(null);
                 toast("Logout Successful");
+                navigate('/signin');
             }
         } catch (error) {
             console.log(error.message);
         }
     };
+
+
+
+
 
 
     return (
@@ -94,7 +95,7 @@ export const Navbar = () => {
                                         {/* <AvatarImage src={authUser.profilePicture || "default_profile.jpg"}  /> */}
                                         <AvatarFallback className="text-2xl bg-red-500 text-white font-bold">
                                             {
-                                                authUser.username?.[0].toUpperCase()
+                                                authUser?.username?.[0].toUpperCase()
                                             }
                                         </AvatarFallback>
                                     </Avatar>
@@ -103,11 +104,11 @@ export const Navbar = () => {
                                     <div className="flex gap-5 space-y-2">
                                         <Avatar className="cursor-pointer" >
                                             <AvatarImage
-                                                src={authUser.profilePicture || "default_profile.jpg"}
+                                                src={authUser?.profilePicture || "default_profile.jpg"}
                                             />
                                         </Avatar>
                                         <div>
-                                            <h4 className="font-medium">{authUser.username}</h4>
+                                            <h4 className="font-medium">{authUser?.username}</h4>
                                             <p className="text-sm text-muted-foreground">{authUser?.bio?.slice(0, 20) + "..."}</p>
                                         </div>
                                     </div>
@@ -115,7 +116,7 @@ export const Navbar = () => {
                                         <div className="flex w-fit items-center gap-2 cursor-pointer">
                                             <User2 />
                                             <Link>
-                                                <Button variant="link" onClick={() => navigate(`/profile/${authUser._id}`)}>View Profile</Button>
+                                                <Button variant="link" onClick={() => navigate(`/profile/${authUser?._id}`)}>View Profile</Button>
                                             </Link>
                                         </div>
                                         <div className="flex w-fit items-center gap-2 cursor-pointer">
