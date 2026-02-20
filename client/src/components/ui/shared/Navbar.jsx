@@ -18,13 +18,15 @@ export const Navbar = () => {
 
 
     const navigate = useNavigate();
-    const { authUser, setAuthUser, authLoading } = useContext(AuthContext);
+    const { authUser, setAuthUser } = useContext(AuthContext);
 
     console.log("Navbar authUser:", authUser);
 
-    if (authLoading) {
+    if (!authUser) {
         return (
-            <div className="h-16 bg-gray-200 animate-pulse"></div>
+            <div className="h-16 bg-gray-200 animate-pulse">
+                <p className='text-center'>Navbar is not loaded yet ! please refresh the page</p>
+            </div>
         );
     }
 
