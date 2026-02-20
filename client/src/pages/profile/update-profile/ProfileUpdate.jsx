@@ -95,7 +95,7 @@ export const ProfileUpdate = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await axios.get(`http://localhost:3000/api/user/profile/${id}`, {
+                const res = await axios.get(`/api/v1/users/${id}`, {
                     withCredentials: true,
                 });
                 const userData = res.data.user;
@@ -216,7 +216,7 @@ export const ProfileUpdate = () => {
                                         name="fullname"
                                         value={formData.fullname}
                                         onChange={handleInputChange}
-                                        placeholder="Anjan Thapa"
+                                        placeholder="John Doe"
                                         className="focus:border-red-500 focus:ring-red-500"
                                     />
                                 </div>
@@ -228,7 +228,7 @@ export const ProfileUpdate = () => {
                                         name="username"
                                         value={formData.username}
                                         onChange={handleInputChange}
-                                        placeholder="@anjan_012"
+                                        placeholder="@john_doe"
                                         className="focus:border-red-500 focus:ring-red-500"
                                     />
                                 </div>
