@@ -65,7 +65,7 @@ export const SignUp = () => {
 
       const toastId = toast.loading("creating your account...");
 
-      const URL = "/api/user/signup/";
+      const URL = "/api/v1/users/";
       const dataToSend = {
         username: user.username,
         email: user.email,
