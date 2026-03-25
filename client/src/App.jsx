@@ -6,33 +6,41 @@ import { Home } from "./pages/Home";
 import { Profile } from "./pages/profile/index";
 import { ProfileUpdate } from "./pages/profile/update-profile/ProfileUpdate";
 import SearchPage from "./pages/search/SearchPage";
+import { ProtectedRoutes } from "./utils/ProtectedRoutes";
 
 const appRouter = createBrowserRouter([
   {
-    path: "/",
-    element: <Home />
+    path: "/signin",
+    element: <SignIn />,
   },
   {
-    path: '/profile/:id',
-    element: <Profile />
-  },
-  {
-    path: '/signup',
-    element: <SignUp />
-  },
-  {
-    path: '/signin',
-    element: <SignIn />
-  },
-  {
-    path: '/profile/:id/update',
-    element: <ProfileUpdate />
+    path: "/signup",
+    element: <SignUp />,
   },
 
+  // ← All protected routes go inside this layout
   {
-    path: '/search',
-    element: <SearchPage />
-  }
+    element: <ProtectedRoutes />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/profile/:id",
+        element: <Profile />,
+      },
+      {
+        path: "/profile/:id/update",
+        element: <ProfileUpdate />,
+      },
+      {
+        path: "/search",
+        element: <SearchPage />,
+      },
+      // Add more protected routes here
+    ],
+  },
 ]);
 
 function App() {

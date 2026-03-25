@@ -88,6 +88,7 @@ export const signIn = async (req, res) => {
 
     const userData = user.toObject(); // Convert Mongoose document to plain object
     delete userData.password; // Remove password field
+    console.log(token);
 
     return res
       .status(200)
@@ -102,9 +103,10 @@ export const signIn = async (req, res) => {
       .json({
         message: `Welcome back, ${user.username}`,
         success: true,
-        // token,
+        token,
         userData,
       });
+
   } catch (error) {
     console.error("Error in signIn controller:", error);
     return res.status(500).json({
