@@ -119,6 +119,9 @@ export const Home = ({
 
           {posts.map((post) => {
             const isLiked = !!likedPosts[post._id]; // true if user just liked it
+            const likeCount = post.likes.length + (isLiked && !post.likes.includes(authUser._id) ? 1 : 0)
+                                 - (!isLiked && post.likes.includes(authUser._id) ? 1 : 0);
+
 
             return (
               <div
@@ -239,8 +242,8 @@ export const Home = ({
                         />
                       </svg>
                       <span>
-                        {post.likes.length 
-                        + (isLiked ? 0 : post.likes.includes(authUser._id) ? -1 : 0)
+                        {
+                          likeCount
                         }
                       </span>
                     </button>
