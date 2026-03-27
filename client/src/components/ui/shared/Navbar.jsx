@@ -20,8 +20,6 @@ export const Navbar = () => {
     const navigate = useNavigate();
     const { authUser, setAuthUser } = useContext(AuthContext);
 
-    console.log("Navbar authUser:", authUser);
-
     if (!authUser) {
         return (
             <div className="h-16 bg-gray-200 animate-pulse">
