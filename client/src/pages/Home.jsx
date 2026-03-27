@@ -1,8 +1,9 @@
-import React from "react";
+import React, { use } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Navbar } from "../components/ui/shared/Navbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { Image as ImageIcon, EllipsisVertical } from "lucide-react";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ import { Link } from "react-router-dom";
 export const Home = ({
   avatarUrl = "default_profile.jpg",
 }) => {
+  const {authUser } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const isOwnPost = true;
   const [postLike, setPostLike] = useState(false);
@@ -47,14 +49,24 @@ export const Home = ({
     const fetchAllPost = async () => {
       try {
         const response = await axios.get(POST_URL, { withCredentials: true });
-        setPosts(response.data.posts);
+        const fetchedPosts = response.data.posts;
+        setPosts(fetchedPosts);
+
+        const initialLikedPosts = {};
+        fetchedPosts.forEach(post => {
+          if (post.likes.includes(authUser._id)) {
+            initialLikedPosts[post._id] = true;
+          }
+        });
+        setLikedPosts(initialLikedPosts);
+
       } catch (err) {
         console.error(err);
       }
     };
 
     fetchAllPost();
-  }, [postLike]);
+  }, []);
 
   const handleDeletePost = async (postId) => {
     try {
@@ -227,7 +239,9 @@ export const Home = ({
                         />
                       </svg>
                       <span>
-                        {post.likes.length + (isLiked ? 1 : 0)}
+                        {post.likes.length 
+                        + (isLiked ? 0 : post.likes.includes(authUser._id) ? -1 : 0)
+                        }
                       </span>
                     </button>
 
