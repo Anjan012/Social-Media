@@ -85,7 +85,7 @@ export const getPostById = async (req, res) => {
     }
 
     const post = await Post.findById(postId)
-      .populate("createdBy", "username profilePicture")
+      .populate("createdBy", "username profilePicture fullname")
       .populate("comments.user", "username profilePicture");
 
     if (!post) {
