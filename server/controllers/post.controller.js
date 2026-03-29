@@ -223,7 +223,7 @@ export const addComment = async (req, res) => {
       });
     }
 
-    post.comments.push({user: id, comment});
+    post.comments.push({user: id, text: comment});
 
     await post.save();
 
