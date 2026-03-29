@@ -40,7 +40,7 @@ const appRouter = createBrowserRouter([
         element: <SearchPage />,
       },
       {
-        path: "/comments",
+        path: "/post/:id/comment",
         element: <CommentPage />,
       }
       // Add more protected routes here
