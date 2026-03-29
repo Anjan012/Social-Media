@@ -5,6 +5,7 @@ import './App.css';
 import { Home } from "./pages/Home";
 import { Profile } from "./pages/profile/index";
 import { ProfileUpdate } from "./pages/profile/update-profile/ProfileUpdate";
+import { CommentPage } from "./pages/comment/index";
 import SearchPage from "./pages/search/SearchPage";
 import { ProtectedRoutes } from "./utils/ProtectedRoutes";
 
@@ -38,6 +39,10 @@ const appRouter = createBrowserRouter([
         path: "/search",
         element: <SearchPage />,
       },
+      {
+        path: "/comments",
+        element: <CommentPage />,
+      }
       // Add more protected routes here
     ],
   },
