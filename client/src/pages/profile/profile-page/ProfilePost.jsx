@@ -105,7 +105,7 @@ const handleDeletePost = async (postId) => {
         toast.error(error.message);
     }
 }
-
+console.log(posts)
 return (
     <>
         {posts.map((post) => {

@@ -218,7 +218,7 @@ export const getUserProfile = async (req, res) => {
 
     const posts = await Post.find({ createdBy: profileUserId }).sort({
       createdAt: -1,
-    });
+    }).populate("createdBy", "username fullname profilePicture");
 
     const isOwnProfile = loggedInUserId === profileUserId;
 
