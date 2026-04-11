@@ -3,10 +3,13 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
+import { useContext } from "react";
 
 export const SignIn = () => {
 
   const navigate = useNavigate();
+  const { refreshAuth } = useContext(AuthContext); 
 
   const [user, setUser] = useState({
     email: "",
@@ -55,7 +58,8 @@ export const SignIn = () => {
       if (response.status === 200) {
         toast.dismiss();
         toast.success("Success, Redirecting to home page");
-        setTimeout(() => {
+        setTimeout(async() => {
+          await refreshAuth();
           navigate('/');
         }, 1500);
       }else{
