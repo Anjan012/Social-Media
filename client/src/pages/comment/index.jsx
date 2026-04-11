@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button } from "../../components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
@@ -14,9 +14,20 @@ export const CommentPage = () => {
     const [postIsLiked, setPostIsLiked] = useState(false); // for the main post like
 
 
-    // Add new comment
-    const handlePostComment = () => {
+    const handlePostComment = async (id) => {
+        const COMMENT_URL = `/api/v1/posts/${id}/comment`;
+        const commentData = {
+            comment: newComment
+        };
+        const response = await axios.post(COMMENT_URL, commentData, { withCredentials: true });
         
+        if(response.status === 200) {
+            toast.success("Comment added successfully!");
+            setNewComment("");
+        }
+        else{
+            toast.error("Failed to add comment. Please try again.");
+        }
     };
 
     // Like/Unlike main post
@@ -29,9 +40,9 @@ export const CommentPage = () => {
     const { id } = useParams();
     const POST_URL = `/api/v1/posts/${id}`;
 
-    const getPost = () => {
+    const getPost = async () => {
 
-        axios.get(POST_URL, { withCredentials: true })
+        await axios.get(POST_URL, { withCredentials: true })
             .then((response) => {
                 setPost(response.data.post);
             })
@@ -41,11 +52,14 @@ export const CommentPage = () => {
     };
 
     useEffect(() => {
-        console.log("Fetching post data...");
         getPost();
     }, []);
 
-    console.log("Post data from state:", post);
+    const handleInput = (event) => {
+        const { value } = event.target;
+        setNewComment(value);
+    }
+
 
     return (
         <div className="max-w-2xl mx-auto py-6 px-4 bg-gray-50 dark:bg-gray-950 min-h-screen">
@@ -114,15 +128,15 @@ export const CommentPage = () => {
 
                     <div className="flex-1">
                         <Textarea
+                            onChange={handleInput}
                             value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Write your comment..."
                             className="min-h-20 resize-y bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-blue-500"
                         />
 
                         <div className="flex justify-end mt-3">
                             <Button
-                                onClick={handlePostComment}
+                                onClick={() => handlePostComment(post._id)}
                                 disabled={!newComment.trim()}
                                 className="flex items-center gap-2 bg-red-600 hover:bg-red-700"
                             >
