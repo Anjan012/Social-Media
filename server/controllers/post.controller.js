@@ -9,17 +9,18 @@ export const createPost = async (req, res) => {
 
     const file = req.file;
 
-    const normalizedPath = file.path.replace(/\\/g, "/");
+    const normalizedPath = file ? file.path.replace(/\\/g, "/") : null;
+
     if (!content && !file) {
       return res.status(400).json({
-        message: "Content is required!",
+        message: "Post content or media is required",
         success: false,
       });
     }
 
     const post = await Post.create({
       content: content || "",
-      image: file ? normalizedPath : null,
+      image: normalizedPath,
       createdBy: userId,
     });
 

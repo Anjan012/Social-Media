@@ -18,8 +18,8 @@ export const PostBox = (
     const [media, setMedia] = useState(null);
     const [mediaPreview, setMediaPreview] = useState(null);
     const [postData, setPostData] = useState({
-    content: ""
-  });
+        content: ""
+    });
     const handleInput = (event) => {
         const { name, value } = event.target;
         setPostData((prev) => ({
@@ -34,10 +34,17 @@ export const PostBox = (
 
         try {
             const formData = new FormData();
-            formData.append("content", postData.content);
+            if (postData.content.trim()) {
+                formData.append("content", postData.content);
+            }
 
             if (media) {
                 formData.append("media", media); // 🔥 MUST MATCH multer
+            }
+
+            if (!postData.content.trim() && !media) {
+                toast.error("Post content or media is required");
+                return;
             }
 
             const response = await axios.post(
@@ -45,13 +52,13 @@ export const PostBox = (
                 formData,
                 {
                     withCredentials: true,
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
+                    // headers: {
+                    //     "Content-Type": "multipart/form-data",
+                    // },
                 }
             );
 
-            if(response.status === 201) {
+            if (response.status === 201) {
                 toast.success("Post created successfully");
             }
 
@@ -68,9 +75,9 @@ export const PostBox = (
         if (!file) return;
         setMedia(file);
         setMediaPreview(URL.createObjectURL(file));
-    
-      }
-    
+
+    }
+
 
     return (
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6 mt-5">
