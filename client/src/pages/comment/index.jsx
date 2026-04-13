@@ -94,7 +94,7 @@ export const CommentPage = () => {
 
                 {/* Post Image */}
                 <img
-                    src={`http://localhost:3000/${post.image}`}
+                    src={post.image}
                     alt="post"
                     className="w-full object-cover max-h-125"
                 />
