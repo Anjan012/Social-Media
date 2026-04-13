@@ -93,12 +93,18 @@ export const signIn = async (req, res) => {
     return res
       .status(200)
       .cookie("token", token, {
-        maxAge: 24 * 60 * 60 * 1000,
-        httpOnly: true, // accessible only by web server
-        // sameSite: "strict", // CSRF protection
-        // secure: true,
-        sameSite: "lax",
-        secure: false,
+        // maxAge: 24 * 60 * 60 * 1000,
+        // httpOnly: true, // accessible only by web server
+        // // sameSite: "strict", // CSRF protection
+        // // secure: true,
+        // sameSite: "lax",
+        // secure: false,
+
+        httpOnly: true,
+        secure: true, // Important for HTTPS (Render uses HTTPS)
+        sameSite: "none", // Required for cross-domain
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: "/",
       })
       .json({
         message: `Welcome back, ${user.username}`,
@@ -106,7 +112,6 @@ export const signIn = async (req, res) => {
         token,
         userData,
       });
-
   } catch (error) {
     console.error("Error in signIn controller:", error);
     return res.status(500).json({
@@ -216,9 +221,11 @@ export const getUserProfile = async (req, res) => {
       });
     }
 
-    const posts = await Post.find({ createdBy: profileUserId }).sort({
-      createdAt: -1,
-    }).populate("createdBy", "username fullname profilePicture");
+    const posts = await Post.find({ createdBy: profileUserId })
+      .sort({
+        createdAt: -1,
+      })
+      .populate("createdBy", "username fullname profilePicture");
 
     const isOwnProfile = loggedInUserId === profileUserId;
 
