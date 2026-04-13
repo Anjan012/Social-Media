@@ -213,8 +213,8 @@ export const Home = ({
 
                 {/* Post Image */}
                 <img
-                  src={`http://localhost:3000/${post.image}`}
-                  alt="post"
+                  src={post.image}
+                  alt="image"
                   className="w-full"
                 />
 

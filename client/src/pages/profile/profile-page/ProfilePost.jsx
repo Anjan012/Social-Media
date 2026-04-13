@@ -203,7 +203,7 @@ return (
 
                     {/* Post Image */}
                     <img
-                        src={`http://localhost:3000/${post.image}`}
+                        src={post.image}
                         alt="post"
                         className="w-full"
                     />
