@@ -21,7 +21,7 @@ const app = express();
 
 const corsOptions = {
     // origin: "http://localhost:5173", // allow requests from this origin
-    origin: true,
+    origin: "https://social-media-frontend-tp54.onrender.com",
     // optionsSuccessStatus: 200,
     credentials: true
 };
