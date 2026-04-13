@@ -1,6 +1,8 @@
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
+import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
 
 export const createPost = async (req, res) => {
   try {
@@ -9,7 +11,23 @@ export const createPost = async (req, res) => {
 
     const file = req.file;
 
-    const normalizedPath = file ? file.path.replace(/\\/g, "/") : null;
+    // const normalizedPath = file ? file.path.replace(/\\/g, "/") : null;
+
+    let imageUrl = null; // 👈 NEW
+
+    // 🚀 Upload to Cloudinary if file exists
+    if (file) {
+      const localFilePath = file.path;
+
+      const result = await cloudinary.uploader.upload(localFilePath, {
+        folder: `users/${userId}/posts`, // 👈 same logic as your multer folders
+      });
+
+      imageUrl = result.secure_url; // 👈 THIS replaces local path
+
+      // 🧹 delete local file
+      fs.unlinkSync(localFilePath);
+    }
 
     if (!content && !file) {
       return res.status(400).json({
@@ -20,7 +38,7 @@ export const createPost = async (req, res) => {
 
     const post = await Post.create({
       content: content || "",
-      image: normalizedPath,
+      image: imageUrl,
       createdBy: userId,
     });
 

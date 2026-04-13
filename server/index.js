@@ -8,6 +8,13 @@ import postRoutes from './routes/post.route.js';
 import path from "path";
 
 dotenv.config();
+import { v2 as cloudinary } from "cloudinary";
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+console.log("Cloudinary configured with:", process.env.CLOUD_NAME ? "OK" : "Missing keys");
 
 const app = express();
 

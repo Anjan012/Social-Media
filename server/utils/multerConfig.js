@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import cryto from "crypto";
+import crypto from "crypto";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
     cb(null, baseDir);
   },
   filename: function (req, file, cb) {
-    cryto.randomBytes(12, function (err, name) {
+    crypto.randomBytes(12, function (err, name) {
       const fn = `post_${name.toString("hex") + path.extname(file.originalname)}`;
       cb(null, fn);
     });
