@@ -17,7 +17,7 @@ export function Profile() {
 
 
     useEffect(() => {
-        const PROFILE_URL = `/api/v1/users/${id}`;
+        const PROFILE_URL = `https://social-media-backend-0jko.onrender.com/api/v1/users/${id}`;
 
         const getProfile = async () => {
             const response = await axios.get(PROFILE_URL, { withCredentials: true });

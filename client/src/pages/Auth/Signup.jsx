@@ -65,7 +65,7 @@ export const SignUp = () => {
 
       const toastId = toast.loading("creating your account...");
 
-      const URL = "/api/v1/users/";
+      const URL = "https://social-media-backend-0jko.onrender.com/api/v1/users/";
       const dataToSend = {
         username: user.username,
         email: user.email,

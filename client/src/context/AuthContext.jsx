@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   // reusable function to check auth
   const refreshAuth = async () => {
     try {
-      const res = await axios.get("/api/v1/users/me", {
+      const res = await axios.get("https://social-media-backend-0jko.onrender.com/api/v1/users/me", {
         withCredentials: true,
       });
       setAuthUser(res.data.user);

@@ -69,7 +69,7 @@ export const ProfilePost = (
         }));
 
         try {
-            const LIKE_URL = `/api/v1/posts/${postId}/like`;
+            const LIKE_URL = `https://social-media-backend-0jko.onrender.com/api/v1/posts/${postId}/like`;
             await axios.post(LIKE_URL, {}, { withCredentials: true });
 
             // No need to call fetchPosts() here
@@ -90,7 +90,7 @@ export const ProfilePost = (
 const handleDeletePost = async (postId) => {
     try {
 
-        const DELETE_URL = `/api/v1/posts/${postId}`;
+        const DELETE_URL = `https://social-media-backend-0jko.onrender.com/api/v1/posts/${postId}`;
         const response = await axios.delete(
             DELETE_URL,
             { withCredentials: true }

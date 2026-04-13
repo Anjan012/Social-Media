@@ -26,7 +26,7 @@ const SearchPage = () => {
                 setLoading(true);
 
                 const res = await axios.get(
-                    `/api/v1/users/search?query=${searchQuery}`,
+                    `https://social-media-backend-0jko.onrender.com/api/v1/users/search?query=${searchQuery}`,
                     { withCredentials: true }
                 );
 

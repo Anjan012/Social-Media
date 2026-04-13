@@ -48,7 +48,7 @@ export const PostBox = (
             }
 
             const response = await axios.post(
-                "/api/v1/posts",
+                "https://social-media-backend-0jko.onrender.com/api/v1/posts",
                 formData,
                 {
                     withCredentials: true,

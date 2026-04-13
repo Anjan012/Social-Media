@@ -72,7 +72,7 @@ export const ProfileUpdate = () => {
         // }
 
         try {
-            const response = await axios.patch("/api/v1/users/me", submitData, {
+            const response = await axios.patch("https://social-media-backend-0jko.onrender.com/api/v1/users/me", submitData, {
                 withCredentials: true,
             });
 
@@ -95,7 +95,7 @@ export const ProfileUpdate = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await axios.get(`/api/v1/users/${id}`, {
+                const res = await axios.get(`https://social-media-backend-0jko.onrender.com/api/v1/users/${id}`, {
                     withCredentials: true,
                 });
                 const userData = res.data.user;

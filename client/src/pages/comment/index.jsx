@@ -15,7 +15,7 @@ export const CommentPage = () => {
 
 
     const handlePostComment = async (id) => {
-        const COMMENT_URL = `/api/v1/posts/${id}/comment`;
+        const COMMENT_URL = `https://social-media-backend-0jko.onrender.com/api/v1/posts/${id}/comment`;
         const commentData = {
             comment: newComment
         };
@@ -38,7 +38,7 @@ export const CommentPage = () => {
 
 
     const { id } = useParams();
-    const POST_URL = `/api/v1/posts/${id}`;
+    const POST_URL = `https://social-media-backend-0jko.onrender.com/api/v1/posts/${id}`;
 
     const getPost = async () => {
 

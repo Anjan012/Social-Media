@@ -25,7 +25,7 @@ export const ProfileSection = ({
 
     const handleFollow = async (id) => {
         try {
-            const URL = `/api/v1/users/${id}/follow`;
+            const URL = `https://social-media-backend-0jko.onrender.com/api/v1/users/${id}/follow`;
 
             const res = await axios.post(
                 URL,

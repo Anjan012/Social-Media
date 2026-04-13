@@ -31,7 +31,7 @@ export const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            const LOGOUT_URL = "/api/v1/sessions";
+            const LOGOUT_URL = "https://social-media-backend-0jko.onrender.com/api/v1/sessions";
 
             const response = await axios.delete(LOGOUT_URL, { withCredentials: true });
 

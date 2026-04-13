@@ -48,7 +48,7 @@ export const SignIn = () => {
     try {
       if (!validateInput()) return;
 
-      const URL = "/api/v1/sessions/";
+      const URL = "https://social-media-backend-0jko.onrender.com/api/v1/sessions/";
       const dataToSend = {
         email: user.email,
         password: user.password
