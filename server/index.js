@@ -19,13 +19,39 @@ console.log("Cloudinary configured with:", process.env.CLOUD_NAME ? "OK" : "Miss
 const app = express();
 
 
+// const corsOptions = {
+//     // origin: "http://localhost:5173", // allow requests from this origin
+//     origin: ["https://social-media-frontend-tp54.onrender.com", "http://localhost:5173"],
+//     // optionsSuccessStatus: 200,
+//     credentials: true
+// };
+// app.use(cors(corsOptions));
+
+
+// Put this in your index.js (replace the old corsOptions)
+const allowedOrigins = [
+    "http://localhost:5173",                          // ← For local development
+    "http://localhost:3000",                          // ← Just in case
+    "https://social-media-frontend-tp54.onrender.com" // ← Your deployed frontend
+];
+
 const corsOptions = {
-    // origin: "http://localhost:5173", // allow requests from this origin
-    origin: "https://social-media-frontend-tp54.onrender.com",
-    // optionsSuccessStatus: 200,
-    credentials: true
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.log(`CORS blocked origin: ${origin}`); // Helpful for debugging
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,          // Important for cookies
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
