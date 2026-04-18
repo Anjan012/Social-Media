@@ -40,12 +40,12 @@ const corsOptions = {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            console.log(`CORS blocked origin: ${origin}`); // Helpful for debugging
+            console.log(`CORS blocked origin: ${origin}`);
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true,          // Important for cookies
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,          
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     optionsSuccessStatus: 200
 };
