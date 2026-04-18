@@ -13,19 +13,17 @@ export const createPost = async (req, res) => {
 
     // const normalizedPath = file ? file.path.replace(/\\/g, "/") : null;
 
-    let imageUrl = null; // 👈 NEW
+    let imageUrl = null; 
 
-    // 🚀 Upload to Cloudinary if file exists
     if (file) {
       const localFilePath = file.path;
 
       const result = await cloudinary.uploader.upload(localFilePath, {
-        folder: `users/${userId}/posts`, // 👈 same logic as your multer folders
+        folder: `users/${userId}/posts`,
       });
 
-      imageUrl = result.secure_url; // 👈 THIS replaces local path
+      imageUrl = result.secure_url;
 
-      // 🧹 delete local file
       fs.unlinkSync(localFilePath);
     }
 

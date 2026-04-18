@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const CommentPage = () => {
 
     const [post, setPost] = useState({});
@@ -15,7 +17,7 @@ export const CommentPage = () => {
 
 
     const handlePostComment = async (id) => {
-        const COMMENT_URL = `https://social-media-backend-0jko.onrender.com/api/v1/posts/${id}/comment`;
+        const COMMENT_URL = `${API_URL}/api/v1/posts/${id}/comment`;
         const commentData = {
             comment: newComment
         };
@@ -38,7 +40,7 @@ export const CommentPage = () => {
 
 
     const { id } = useParams();
-    const POST_URL = `https://social-media-backend-0jko.onrender.com/api/v1/posts/${id}`;
+    const POST_URL = `${API_URL}/api/v1/posts/${id}`;
 
     const getPost = async () => {
 
@@ -69,7 +71,7 @@ export const CommentPage = () => {
                 <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
-                            <AvatarImage src={`http://localhost:3000/${post.image}`} />
+                            <AvatarImage src={post.createdBy?.profilePicture || "default_profile.jpg"} alt="User" />
                             <AvatarFallback>AS</AvatarFallback>
                         </Avatar>
                         <div>
@@ -122,7 +124,7 @@ export const CommentPage = () => {
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6">
                 <div className="flex gap-3">
                     <Avatar className="h-9 w-9 shrink-0">
-                        <AvatarImage src={`http://localhost:3000/${post.image}`} />
+                        <AvatarImage src={post.createdBy?.profilePicture || "default_profile.jpg"} alt="User" />
                         <AvatarFallback>AN</AvatarFallback>
                     </Avatar>
 
@@ -161,7 +163,7 @@ export const CommentPage = () => {
                     >
                         <div className="flex gap-3">
                             <Avatar className="h-9 w-9 shrink-0">
-                                <AvatarImage src={comment.user.avatar} />
+                                <AvatarImage src={comment.user.profilePicture || "default_profile.jpg"} alt="User" />
                                 <AvatarFallback>{comment.user.username[0].toUpperCase()}</AvatarFallback>
                             </Avatar>
 

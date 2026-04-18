@@ -7,6 +7,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const ProfileSection = ({
     avatarUrl = "default_profile.jpg",
     profileData,
@@ -25,7 +27,7 @@ export const ProfileSection = ({
 
     const handleFollow = async (id) => {
         try {
-            const URL = `https://social-media-backend-0jko.onrender.com/api/v1/users/${id}/follow`;
+            const URL = `${API_URL}/api/v1/users/${id}/follow`;
 
             const res = await axios.post(
                 URL,
@@ -55,7 +57,7 @@ export const ProfileSection = ({
                             {/* Large avatar */}
                             <div className="shrink-0 mx-auto sm:mx-0">
                                 <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 lg:mt-12 border-white dark:border-gray-900 shadow-xl">
-                                    <AvatarImage src={avatarUrl} alt="user" />
+                                    <AvatarImage src={user.profilePicture} alt="user" />
                                     <AvatarFallback className="text-4xl bg-red-500 text-white font-bold">
                                         {
                                             user.username?.[0].toUpperCase()

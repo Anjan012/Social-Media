@@ -7,7 +7,10 @@ import { toast } from "sonner";
 import { useState } from "react";
 import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {AuthContext} from "../../context/AuthContext";
+import { useContext } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const PostBox = (
     {
@@ -28,6 +31,7 @@ export const PostBox = (
         }));
     };
 
+    const { authUser } = useContext(AuthContext);
 
     const handleCreatePost = async (e) => {
         e.preventDefault();
@@ -48,7 +52,7 @@ export const PostBox = (
             }
 
             const response = await axios.post(
-                "https://social-media-backend-0jko.onrender.com/api/v1/posts",
+                `${API_URL}/api/v1/posts`,
                 formData,
                 {
                     withCredentials: true,
@@ -83,7 +87,7 @@ export const PostBox = (
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6 mt-5">
             <div className="flex items-start gap-3">
                 <Avatar className="h-10 w-10 shrink-0">
-                    <AvatarImage src={avatarUrl} alt={displayName} />
+                    <AvatarImage src={authUser?.profilePicture || "default_profile.jpg"} alt={displayName} />
                     <AvatarFallback className="bg-red-500 text-white">
                         {displayName?.[0] || "?"}
                     </AvatarFallback>

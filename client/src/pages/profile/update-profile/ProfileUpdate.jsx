@@ -11,6 +11,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useParams } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
 export const ProfileUpdate = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -55,13 +56,30 @@ export const ProfileUpdate = () => {
         e.preventDefault();
         setIsLoading(true);
 
-        const submitData = {
-            username: formData.fullname,
-            fullname: formData.username,
-            bio: formData.bio,
-            location: formData.location,
-            website: formData.website
+        const formDataToSend = new FormData();
+        formDataToSend.append("fullname", formData.fullname || "");
+        formDataToSend.append("username", formData.username || "");
+        formDataToSend.append("bio", formData.bio || "");
+        formDataToSend.append("location", formData.location || "");
+        formDataToSend.append("website", formData.website || "");
+
+        const profileImage = profilePicRef.current?.files?.[0];
+
+        if(profileImage) {
+            formDataToSend.append("profilePicture", profileImage);
+            console.log("✅ Sending profile picture:", profileImage.name, "Size:", (profileImage.size / 1024).toFixed(2) + " KB");
+        } else {
+            console.log("No new profile picture selected");
         }
+
+        // const submitData = {
+        //     username: formData.fullname,
+        //     fullname: formData.username,
+        //     bio: formData.bio,
+        //     location: formData.location,
+        //     website: formData.website,
+        //     profilePicture: formData.profilePicture,
+        // }
 
         // // Add files if selected
         // if (profilePicRef.current?.files?.[0]) {
@@ -72,9 +90,10 @@ export const ProfileUpdate = () => {
         // }
 
         try {
-            const response = await axios.patch("https://social-media-backend-0jko.onrender.com/api/v1/users/me", submitData, {
+            const response = await axios.patch(`${API_URL}/api/v1/users/me`, formDataToSend, {
                 withCredentials: true,
             });
+
 
             if (response.status === 200) {
                 // Simulate success
@@ -95,7 +114,7 @@ export const ProfileUpdate = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await axios.get(`https://social-media-backend-0jko.onrender.com/api/v1/users/${id}`, {
+                const res = await axios.get(`${API_URL}/api/v1/users/${id}`, {
                     withCredentials: true,
                 });
                 const userData = res.data.user;

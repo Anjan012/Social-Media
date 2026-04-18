@@ -2,6 +2,9 @@ import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Post } from "../models/post.model.js";
+import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
+import { profile } from "console";
 
 export const signUp = async (req, res) => {
   try {
@@ -170,7 +173,22 @@ export const updateProfile = async (req, res) => {
 
     // cloudinary will come here....
 
-    const userId = req.id; // come from the middleware
+    let imageURL = null;
+    const userId = req.id; 
+
+    if (file) {
+      const localFilePath = file.path;
+
+      const result = await cloudinary.uploader.upload(localFilePath, {
+        folder: `users/${userId}/profile`,
+      });
+
+      imageURL = result.secure_url; 
+
+      fs.unlinkSync(localFilePath);
+
+    }
+
 
     const user = await User.findById(userId);
 
@@ -187,6 +205,7 @@ export const updateProfile = async (req, res) => {
     if (location) user.location = location;
     if (website) user.website = website;
     if (dob) user.dob = dob;
+    if(imageURL) user.profilePicture = imageURL;
 
     await user.save();
 
@@ -195,7 +214,7 @@ export const updateProfile = async (req, res) => {
 
     return res.status(200).json({
       message: "Profile updated Successfully",
-      sucess: true,
+      success: true,
       userData,
     });
   } catch (error) {

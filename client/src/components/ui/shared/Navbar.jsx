@@ -92,7 +92,7 @@ export const Navbar = () => {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Avatar>
-                                        {/* <AvatarImage src={authUser.profilePicture || "default_profile.jpg"}  /> */}
+                                        <AvatarImage src={authUser.profilePicture || "default_profile.jpg"}  />
                                         <AvatarFallback className="text-2xl bg-red-500 text-white font-bold">
                                             {
                                                 authUser?.username?.[0].toUpperCase()
@@ -104,7 +104,7 @@ export const Navbar = () => {
                                     <div className="flex gap-5 space-y-2">
                                         <Avatar className="cursor-pointer" >
                                             <AvatarImage
-                                                src={authUser?.profilePicture || "default_profile.jpg"}
+                                                src={authUser?.profilePicture}
                                             />
                                         </Avatar>
                                         <div>

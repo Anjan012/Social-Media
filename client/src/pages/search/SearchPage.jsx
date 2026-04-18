@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const SearchPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -26,7 +28,7 @@ const SearchPage = () => {
                 setLoading(true);
 
                 const res = await axios.get(
-                    `https://social-media-backend-0jko.onrender.com/api/v1/users/search?query=${searchQuery}`,
+                    `${API_URL}/api/v1/users/search?query=${searchQuery}`,
                     { withCredentials: true }
                 );
 

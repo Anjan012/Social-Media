@@ -8,6 +8,8 @@ import { ProfileTab } from "./profile-page/ProfileTab";
 import { PostBox } from "../shared/Postbox";
 import { ProfilePost } from "./profile-page/ProfilePost";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export function Profile() {
 
   const { id } = useParams();
@@ -17,7 +19,7 @@ export function Profile() {
 
 
     useEffect(() => {
-        const PROFILE_URL = `https://social-media-backend-0jko.onrender.com/api/v1/users/${id}`;
+        const PROFILE_URL = `${API_URL}/api/v1/users/${id}`;
 
         const getProfile = async () => {
             const response = await axios.get(PROFILE_URL, { withCredentials: true });
@@ -39,7 +41,7 @@ export function Profile() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <ProfileSection profileData={profileData} user={user}/>
           <ProfileTab />
-          <PostBox  />
+          <PostBox />
           <ProfilePost posts={posts} user={user} profileData={profileData}/>
         </div>
       </div >

@@ -32,6 +32,8 @@ import {
 import { PostBox } from "./shared/Postbox";
 import { Link } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const Home = ({
   avatarUrl = "default_profile.jpg",
 }) => {
@@ -44,7 +46,7 @@ export const Home = ({
   const [likedPosts, setLikedPosts] = useState({});
 
   useEffect(() => {
-    const POST_URL = 'https://social-media-backend-0jko.onrender.com/api/v1/posts';
+    const POST_URL = `${API_URL}/api/v1/posts`;
 
     const fetchAllPost = async () => {
       try {
@@ -70,7 +72,7 @@ export const Home = ({
 
   const handleDeletePost = async (postId) => {
     try {
-      const DELETE_URL = `https://social-media-backend-0jko.onrender.com/api/v1/posts/${postId}`;
+      const DELETE_URL = `${API_URL}/api/v1/posts/${postId}`;
       const response = await axios.delete(
         DELETE_URL,
         { withCredentials: true }
@@ -96,7 +98,7 @@ export const Home = ({
     }));
 
     try {
-      const LIKE_URL = `https://social-media-backend-0jko.onrender.com/api/v1/posts/${postId}/like`;
+      const LIKE_URL = `${API_URL}/api/v1/posts/${postId}/like`;
       await axios.post(LIKE_URL, {}, { withCredentials: true });
       setPostLike(prev => !prev); // still refresh eventually
     } catch (error) {
@@ -132,7 +134,7 @@ export const Home = ({
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={avatarUrl} alt="User" />
+                      <AvatarImage src={post.createdBy.profilePicture || "default_profile.jpg"} alt="User" />
                       <AvatarFallback className="bg-red-500 text-white">AH</AvatarFallback>
                     </Avatar>
                     <div>

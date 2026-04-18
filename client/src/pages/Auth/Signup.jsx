@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const SignUp = () => {
 
   const navigate = useNavigate();
@@ -65,7 +67,7 @@ export const SignUp = () => {
 
       const toastId = toast.loading("creating your account...");
 
-      const URL = "https://social-media-backend-0jko.onrender.com/api/v1/users/";
+      const URL = `${API_URL}/api/v1/users/`;
       const dataToSend = {
         username: user.username,
         email: user.email,

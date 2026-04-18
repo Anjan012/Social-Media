@@ -1,6 +1,7 @@
 import express from "express";
 import { signIn, signUp, logout, updateProfile, getUserProfile, getMe, searchUser, followUser } from "../controllers/user.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
+import { uploadProfilePicture } from "../utils/profileMulterConfig.js";
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.route('/sessions').delete(isAuthenticated, logout);
 
 // Current user routes
 router.route('/users/me').get(isAuthenticated, getMe);
-router.route('/users/me').patch(isAuthenticated, updateProfile);
+router.route('/users/me').patch(isAuthenticated, uploadProfilePicture.single("profilePicture"), updateProfile);
 
 // static route > Dynamic route > wildcard route
 router.route('/users/search').get(isAuthenticated, searchUser);

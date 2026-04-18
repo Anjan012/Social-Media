@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useContext } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const SignIn = () => {
 
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ export const SignIn = () => {
     try {
       if (!validateInput()) return;
 
-      const URL = "https://social-media-backend-0jko.onrender.com/api/v1/sessions/";
+      const URL = `${API_URL}/api/v1/sessions/`;
       const dataToSend = {
         email: user.email,
         password: user.password
