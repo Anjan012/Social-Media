@@ -147,7 +147,7 @@ export const ProfileSection = ({
                                 {/* Large avatar */}
                                 <div className="shrink-0 mx-auto sm:mx-0">
                                     <Avatar className="w-32 h-32 sm:w-40 sm:h-40 border-4 lg:mt-12 border-white dark:border-gray-900 shadow-xl">
-                                        <AvatarImage src={avatarUrl} alt="user" />
+                                        <AvatarImage src={user.profilePicture} alt="user" />
                                         <AvatarFallback className="text-4xl bg-red-500 text-white">
                                             {
                                                 user.username?.[0].toUpperCase()

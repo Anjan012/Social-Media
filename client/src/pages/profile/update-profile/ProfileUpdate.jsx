@@ -72,22 +72,13 @@ export const ProfileUpdate = () => {
             console.log("No new profile picture selected");
         }
 
-        // const submitData = {
-        //     username: formData.fullname,
-        //     fullname: formData.username,
-        //     bio: formData.bio,
-        //     location: formData.location,
-        //     website: formData.website,
-        //     profilePicture: formData.profilePicture,
-        // }
-
-        // // Add files if selected
-        // if (profilePicRef.current?.files?.[0]) {
-        //     submitData.append("profilePicture", profilePicRef.current.files[0]);
-        // }
-        // if (coverPicRef.current?.files?.[0]) {
-        //     submitData.append("coverPicture", coverPicRef.current.files[0]);
-        // }
+        const coverImage = coverPicRef.current?.files?.[0];
+        if(coverImage) {
+            formDataToSend.append("coverPicture", coverImage);
+            console.log("✅ Sending cover picture:", coverImage.name, "Size:", (coverImage.size / 1024).toFixed(2) + " KB");
+        } else {
+            console.log("No new cover picture selected");
+        }
 
         try {
             const response = await axios.patch(`${API_URL}/api/v1/users/me`, formDataToSend, {

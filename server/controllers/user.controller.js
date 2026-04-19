@@ -173,17 +173,35 @@ export const updateProfile = async (req, res) => {
 
     // cloudinary will come here....
 
-    let imageURL = null;
+    const profileFile = req.files?.profilePicture?.[0];  
+    const coverFile   = req.files?.coverPicture?.[0];
+
     const userId = req.id; 
 
-    if (file) {
-      const localFilePath = file.path;
+    let profilePictureURL = null;
+    let coverPictureURL   = null;
+
+    if (profileFile) {
+      const localFilePath = profileFile.path;
 
       const result = await cloudinary.uploader.upload(localFilePath, {
         folder: `users/${userId}/profile`,
       });
 
-      imageURL = result.secure_url; 
+      profilePictureURL = result.secure_url; 
+
+      fs.unlinkSync(localFilePath);
+
+    }
+
+    if (coverFile) {
+      const localFilePath = coverFile.path;
+
+      const result = await cloudinary.uploader.upload(localFilePath, {
+        folder: `users/${userId}/cover`,
+      });
+
+      coverPictureURL = result.secure_url; 
 
       fs.unlinkSync(localFilePath);
 
@@ -205,12 +223,13 @@ export const updateProfile = async (req, res) => {
     if (location) user.location = location;
     if (website) user.website = website;
     if (dob) user.dob = dob;
-    if(imageURL) user.profilePicture = imageURL;
+    if(profilePictureURL) user.profilePicture = profilePictureURL;
+    if(coverPictureURL) user.coverPicture = coverPictureURL;
 
     await user.save();
 
-    const userData = user.toObject(); // Convert Mongoose document to plain object
-    delete userData.password; // Remove password field
+    const userData = user.toObject();
+    delete userData.password;
 
     return res.status(200).json({
       message: "Profile updated Successfully",

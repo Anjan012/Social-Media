@@ -2,6 +2,8 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -11,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   // reusable function to check auth
   const refreshAuth = async () => {
     try {
-      const res = await axios.get("https://social-media-backend-0jko.onrender.com/api/v1/users/me", {
+      const res = await axios.get(`${API_URL}/api/v1/users/me`, {
         withCredentials: true,
       });
       setAuthUser(res.data.user);

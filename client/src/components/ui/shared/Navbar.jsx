@@ -12,7 +12,9 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
-import { useContext} from 'react';
+import { useContext } from 'react';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const Navbar = () => {
 
@@ -28,18 +30,16 @@ export const Navbar = () => {
         );
     }
 
-
     const handleLogout = async () => {
         try {
-            const LOGOUT_URL = "https://social-media-backend-0jko.onrender.com/api/v1/sessions";
+            const LOGOUT_URL = `${API_URL}/api/v1/sessions`;
 
-            const response = await axios.delete(LOGOUT_URL, { withCredentials: true });
+            await axios.delete(LOGOUT_URL, { withCredentials: true });
 
-            if (response.status === 200) {
-                setAuthUser(null);
-                toast("Logout Successful");
-                navigate('/signin');
-            }
+            setAuthUser(null); 
+            localStorage.removeItem('someToken'); // if
+            toast("Logged out successfully");
+            navigate('/signin');
         } catch (error) {
             console.log(error.message);
         }
@@ -92,7 +92,7 @@ export const Navbar = () => {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Avatar>
-                                        <AvatarImage src={authUser.profilePicture || "default_profile.jpg"}  />
+                                        <AvatarImage src={authUser.profilePicture || "default_profile.jpg"} />
                                         <AvatarFallback className="text-2xl bg-red-500 text-white font-bold">
                                             {
                                                 authUser?.username?.[0].toUpperCase()
