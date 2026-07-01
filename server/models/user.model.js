@@ -65,8 +65,6 @@ const userSchema = new mongoose.Schema(
     dob: {
       type: Date,
     },
-    facebookId,
-    provider,
 
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
