@@ -1,4 +1,3 @@
-import React, { use } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Navbar } from "../components/ui/shared/Navbar";
@@ -14,7 +13,6 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
@@ -27,20 +25,16 @@ import {
   Copy,
   Share2,
   VolumeX,
-  UserMinus,
 } from "lucide-react";
 import { PostBox } from "./shared/Postbox";
 import { Link } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const Home = ({
-  avatarUrl = "default_profile.jpg",
-}) => {
+export const Home = () => {
   const { authUser } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const isOwnPost = true;
-  const [postLike, setPostLike] = useState(false);
 
   // Store which posts are liked by current user (local UI state)
   const [likedPosts, setLikedPosts] = useState({});
@@ -80,7 +74,6 @@ export const Home = ({
 
       if (response.status === 200) {
         toast(`Post deleted successfully`);
-        setPostLike(prev => !prev); // refresh list
       }
     } catch (error) {
       console.log(error);
@@ -100,7 +93,6 @@ export const Home = ({
     try {
       const LIKE_URL = `${API_URL}/api/v1/posts/${postId}/like`;
       await axios.post(LIKE_URL, {}, { withCredentials: true });
-      setPostLike(prev => !prev); // still refresh eventually
     } catch (error) {
       console.log(error);
       // Revert on failure
