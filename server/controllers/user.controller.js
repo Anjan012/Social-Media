@@ -302,7 +302,7 @@ export const searchUser = async (req, res) => {
         { fullname: { $regex: query, $options: "i" } },
       ],
     })
-      .select("-password")
+      .select("_id username fullname profilePicture bio")
       .limit(10);
 
     return res.status(200).json({
