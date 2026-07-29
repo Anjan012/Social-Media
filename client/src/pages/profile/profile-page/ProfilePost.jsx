@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/popover";
 import {
     Command,
-    CommandEmpty,
     CommandGroup,
     CommandItem,
     CommandList,
@@ -24,7 +23,7 @@ import {
     VolumeX,
     UserMinus,
 } from "lucide-react";
-import { Image as ImageIcon, EllipsisVertical } from "lucide-react";
+import { Image as EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useContext, useEffect } from "react";
@@ -34,10 +33,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const ProfilePost = (
     {
-        avatarUrl = "default_profile.jpg",
         posts,
-        user,
-        profileData
     }
 ) => {
 
@@ -203,11 +199,18 @@ export const ProfilePost = (
                         </div>
 
                         {/* Post Image */}
-                        <img
-                            src={post.image}
-                            alt="post"
-                            className="w-full"
-                        />
+                        {
+                            post.image && (
+                                <img
+                                    src={post.image}
+                                    alt="post"
+                                    className="w-full"
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+
+                            )
+                        }
 
                         {/* Post Actions */}
                         <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
