@@ -206,11 +206,20 @@ export const Home = () => {
                 </div>
 
                 {/* Post Image */}
-                <img
-                  src={post.image}
-                  alt="image"
-                  className="w-full"
-                />
+                {
+                  post.image &&
+                  (
+                    <img
+                      src={post.image}
+                      alt="Post"
+                      width={800}
+                      height={600}
+                      className="w-full h-auto"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )
+                }
 
                 {/* Post Actions */}
                 <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">

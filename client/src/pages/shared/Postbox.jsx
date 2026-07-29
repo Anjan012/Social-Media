@@ -15,10 +15,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const PostBox = (
     {
         displayName = "@Anjan_012",
-        avatarUrl = "default_profile.jpg",
     },
 ) => {
     const [media, setMedia] = useState(null);
+    const [isPosting, setIsPosting] = useState(false);
     const [mediaPreview, setMediaPreview] = useState(null);
     const [postData, setPostData] = useState({
         content: ""
@@ -37,6 +37,7 @@ export const PostBox = (
         e.preventDefault();
 
         try {
+            setIsPosting(true);
             const formData = new FormData();
             if (postData.content.trim()) {
                 formData.append("content", postData.content);
@@ -71,6 +72,8 @@ export const PostBox = (
         } catch (error) {
             console.error(error);
             toast.error("Failed to create post");
+        } finally {
+            setIsPosting(false);``
         }
     };
 
@@ -136,9 +139,9 @@ export const PostBox = (
                         <Button
                             className="bg-red-500 hover:bg-red-600 text-white px-6"
                             onClick={handleCreatePost}
-                            disabled={!postData.content.trim() && !media}
+                            disabled={isPosting || (!postData.content.trim() && !media)}
                         >
-                            Post
+                            {isPosting ? "Posting..." : "Post"}
                         </Button>
 
                     </div>
