@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Heart, MessageCircle, Send } from "lucide-react";
+import { Heart, MessageCircle, Send, Slice } from "lucide-react";
 import { toast } from "sonner";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
@@ -22,12 +22,12 @@ export const CommentPage = () => {
             comment: newComment
         };
         const response = await axios.post(COMMENT_URL, commentData, { withCredentials: true });
-        
-        if(response.status === 200) {
+
+        if (response.status === 200) {
             toast.success("Comment added successfully!");
             setNewComment("");
         }
-        else{
+        else {
             toast.error("Failed to add comment. Please try again.");
         }
     };
@@ -156,27 +156,34 @@ export const CommentPage = () => {
                     Comments ({post.comments?.length || 0})
                 </h3>
 
-                {post.comments?.map((comment) => (
+                {post.comments?.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((comment) => (
                     <div
                         key={comment._id}
                         className="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-200 dark:border-gray-800"
                     >
                         <div className="flex gap-3">
-                            <Avatar className="h-9 w-9 shrink-0">
-                                <AvatarImage src={comment.user.profilePicture || "default_profile.jpg"} alt="User" />
-                                <AvatarFallback>{comment.user.username[0].toUpperCase()}</AvatarFallback>
-                            </Avatar>
+
+                            <Link to={`/profile/${comment?.user._id}`}>
+                                <Avatar className="h-9 w-9 shrink-0">
+                                    <AvatarImage src={comment.user.profilePicture || "default_profile.jpg"} alt="User" />
+                                    <AvatarFallback>{comment.user.username[0].toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                            </Link>
 
                             <div className="flex-1">
                                 <div className="flex items-center justify-between">
-                                    <div>
-                                        <span className="font-semibold text-gray-900 dark:text-white">
-                                            {comment.user.username}
-                                        </span>
-                                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                                            {comment.createdAt}
-                                        </span>
-                                    </div>
+                                    <Link to={`/profile/${comment?.user._id}`}>
+
+                                        <div>
+                                            <span className="font-semibold text-gray-900 dark:text-white">
+                                                {comment.user.username}
+                                            </span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                                {new Date(comment.createdAt).toLocaleString()}
+                                            </span>
+                                        </div>
+                                    </Link>
+
                                 </div>
 
                                 <p className="mt-1 text-gray-700 dark:text-gray-300 leading-relaxed">

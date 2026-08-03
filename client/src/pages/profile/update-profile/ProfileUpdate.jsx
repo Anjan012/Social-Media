@@ -20,7 +20,11 @@ export const ProfileUpdate = () => {
         bio: "",
         location: "",
         website: "",
+        coverPic: "",
+        profilePicture: ""
     });
+
+    console.log(formData);
 
     const [profilePic, setProfilePic] = useState(null); // preview URL
     const [coverPic, setCoverPic] = useState(null);
@@ -65,7 +69,7 @@ export const ProfileUpdate = () => {
 
         const profileImage = profilePicRef.current?.files?.[0];
 
-        if(profileImage) {
+        if (profileImage) {
             formDataToSend.append("profilePicture", profileImage);
             console.log("✅ Sending profile picture:", profileImage.name, "Size:", (profileImage.size / 1024).toFixed(2) + " KB");
         } else {
@@ -73,7 +77,7 @@ export const ProfileUpdate = () => {
         }
 
         const coverImage = coverPicRef.current?.files?.[0];
-        if(coverImage) {
+        if (coverImage) {
             formDataToSend.append("coverPicture", coverImage);
             console.log("✅ Sending cover picture:", coverImage.name, "Size:", (coverImage.size / 1024).toFixed(2) + " KB");
         } else {
@@ -116,11 +120,12 @@ export const ProfileUpdate = () => {
                     bio: userData.bio || "",
                     location: userData.location || "",
                     website: userData.website || "",
+                    coverPicture: userData.coverPicture || "",
+                    profilePicture: userData.profilePicture || ""
                 });
 
-                // // Set current profile picture preview (from backend URL)
-                // if (userData.profilePicture) {
-                //   setProfilePicPreview(userData.profilePicture); // assume it's a URL
+                setProfilePic(userData.profilePicture || null);
+                setCoverPic(userData.coverPicture || null);
                 // }
             } catch (err) {
                 console.error("Failed to load profile", err);
@@ -129,7 +134,7 @@ export const ProfileUpdate = () => {
         };
 
         fetchProfile();
-    }, []);
+    }, [id]);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-950 sm:px-2 lg:px-8">

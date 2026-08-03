@@ -1,11 +1,10 @@
-import React, { use } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Navbar } from "../components/ui/shared/Navbar";
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { Image as ImageIcon, EllipsisVertical } from "lucide-react";
+import { Image as EllipsisVertical, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Popover,
@@ -14,7 +13,6 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
@@ -27,20 +25,16 @@ import {
   Copy,
   Share2,
   VolumeX,
-  UserMinus,
 } from "lucide-react";
 import { PostBox } from "./shared/Postbox";
 import { Link } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const Home = ({
-  avatarUrl = "default_profile.jpg",
-}) => {
+export const Home = () => {
   const { authUser } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const isOwnPost = true;
-  const [postLike, setPostLike] = useState(false);
 
   // Store which posts are liked by current user (local UI state)
   const [likedPosts, setLikedPosts] = useState({});
@@ -80,7 +74,6 @@ export const Home = ({
 
       if (response.status === 200) {
         toast(`Post deleted successfully`);
-        setPostLike(prev => !prev); // refresh list
       }
     } catch (error) {
       console.log(error);
@@ -100,7 +93,6 @@ export const Home = ({
     try {
       const LIKE_URL = `${API_URL}/api/v1/posts/${postId}/like`;
       await axios.post(LIKE_URL, {}, { withCredentials: true });
-      setPostLike(prev => !prev); // still refresh eventually
     } catch (error) {
       console.log(error);
       // Revert on failure
@@ -111,6 +103,30 @@ export const Home = ({
       toast.error("Couldn't update like");
     }
   };
+
+  const handleCopyLink = async (postId) => {
+    const url = `${window.location.origin}/post/${postId}/comment`;
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        toast.success("Copied to clipboard");
+      } else {
+        // fallback for unsupported browsers
+        const textArea = document.createElement("textarea");
+        textArea.value = url;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        console.log("Copied with fallback:", url);
+      }
+    } catch (error) {
+      console.error("Copy failed:", error);
+    }
+  };
+
 
   return (
     <>
@@ -214,11 +230,20 @@ export const Home = ({
                 </div>
 
                 {/* Post Image */}
-                <img
-                  src={post.image}
-                  alt="image"
-                  className="w-full"
-                />
+                {
+                  post.image &&
+                  (
+                    <img
+                      src={post.image}
+                      alt="Post"
+                      width={800}
+                      height={600}
+                      className="w-full h-auto"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )
+                }
 
                 {/* Post Actions */}
                 <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-800">
@@ -263,12 +288,29 @@ export const Home = ({
                       </button>
                     </Link>
 
-                    <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367 2.684m0-5.368a3 3 0 10-5.367 2.684m6.632 3.316l-6.632 3.316" />
-                      </svg>
-                      <span>0</span>
-                    </button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367 2.684m0-5.368a3 3 0 10-5.367 2.684m6.632 3.316l-6.632 3.316" />
+                          </svg>
+                          <span>0</span>
+                        </button>
+                      </PopoverTrigger>
+
+                      <PopoverContent className="w-72 p-0" align="end">
+                        <Command className="rounded-lg border shadow-md">
+                          <CommandList>
+                            <CommandGroup>
+                              <CommandItem className="cursor-pointer flex items-center gap-3 px-4 py-3 text-sm">
+                                <Link2 className="h-4 w-4" />
+                                <span onClick={() => handleCopyLink(post._id)}>Copy link</span>
+                              </CommandItem>
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
               </div>
