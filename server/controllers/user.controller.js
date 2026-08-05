@@ -1,10 +1,14 @@
+// a controller job is to get data request call service and send repsonse 
+
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Post } from "../models/post.model.js";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
-import { profile } from "console";
+import { 
+  getMeService as _getMeService
+} from "../services/user.service.js";
 
 export const signUp = async (req, res) => {
   try {
@@ -148,16 +152,7 @@ export const logout = async (req, res) => {
 };
 
 export const getMe = async (req, res) => {
-  const loggedInId = req.id;
-
-  const user = await User.findById(loggedInId).select("-password");
-
-  if (!user) {
-    return res.status(404).json({
-      message: "User not found!",
-      success: false,
-    });
-  }
+  const user = await _getMeService(req.id);
 
   return res.status(200).json({
     success: true,
