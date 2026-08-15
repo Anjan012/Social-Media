@@ -70,11 +70,7 @@ export const updateProfileService = async ({
   const userData = user.toObject();
   delete userData.password;
 
-  return res.status(200).json({
-    message: "Profile updated Successfully",
-    success: true,
-    userData,
-  });
+  return userData;
 };
 
 export const getUserProfileService = async (

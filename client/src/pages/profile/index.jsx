@@ -26,7 +26,7 @@ export function Profile() {
       // setProfileData(response.data);
       // setUser(response.data.user);
       // setPosts(response.data.posts);
-      console.log(response.data);
+      // console.log(response.data);
       setProfileData(response.data.userData);
       setUser(response.data.userData.user);
       setPosts(response.data.userData.posts);

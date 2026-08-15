@@ -24,7 +24,7 @@ export const ProfileUpdate = () => {
         profilePicture: ""
     });
 
-    console.log(formData);
+    // console.log(formData);
 
     const [profilePic, setProfilePic] = useState(null); // preview URL
     const [coverPic, setCoverPic] = useState(null);
@@ -112,7 +112,7 @@ export const ProfileUpdate = () => {
                 const res = await axios.get(`${API_URL}/api/v1/users/${id}`, {
                     withCredentials: true,
                 });
-                const userData = res.data.user;
+                const userData = res.data.userData.user;
                 // Fill form with current values
                 setFormData({
                     fullname: userData.fullname || "",
