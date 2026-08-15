@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import { Post } from "../models/post.model.js";
 import { notFound } from "../utils/error/error-helper.js";
 
 export const getMeService = async (userId) => {
@@ -74,5 +75,36 @@ export const updateProfileService = async ({
     success: true,
     userData,
   });
+};
+
+export const getUserProfileService = async (
+  {
+    loggedInUserId,
+    profileUserId
+  }) => {
+    const user = await User.findById(profileUserId).select("-password");
+
+    if (!user) {
+      notFound("User not found!");
+    }
+
+    const posts = await Post.find({ createdBy: profileUserId })
+      .sort({
+        createdAt: -1,
+      })
+      .populate("createdBy", "username fullname profilePicture");
+
+    const isOwnProfile = loggedInUserId === profileUserId;
+
+    const isFollowing = user.followers?.includes(loggedInUserId);
+
+    return{
+      success: true,
+      user,
+      posts,
+      isOwnProfile,
+      isFollowing,
+      message: "User profile fetched successfully!",
+    };
 };
 

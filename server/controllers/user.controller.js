@@ -1,4 +1,4 @@
-// a controller job is to get data request call service and send repsonse 
+// a controller job is to get data request call service and send repsonse
 
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
@@ -6,8 +6,10 @@ import jwt from "jsonwebtoken";
 import { Post } from "../models/post.model.js";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
-import { 
-  getMeService as _getMeService
+import {
+  getMeService as _getMeService,
+  updateProfileService as _updateProfileService,
+  getUserProfileService as _getUserProfileService
 } from "../services/user.service.js";
 
 export const signUp = async (req, res) => {
@@ -162,122 +164,65 @@ export const getMe = async (req, res) => {
 };
 
 export const updateProfile = async (req, res) => {
-  try {
-    const { username, fullname, bio, location, website, dob } = req.body;
-    const file = req.file;
+  const userData = await _updateProfileService({
+    userId: req.id,
+    ...req.body,
+    profileFile: req.files?.profilePicture?.[0],
+    coverFile: req.files?.coverPicture?.[0],
+  });
 
-    // cloudinary will come here....
-
-    const profileFile = req.files?.profilePicture?.[0];  
-    const coverFile   = req.files?.coverPicture?.[0];
-
-    const userId = req.id; 
-
-    let profilePictureURL = null;
-    let coverPictureURL   = null;
-
-    if (profileFile) {
-      const localFilePath = profileFile.path;
-
-      const result = await cloudinary.uploader.upload(localFilePath, {
-        folder: `users/${userId}/profile`,
-      });
-
-      profilePictureURL = result.secure_url; 
-
-      fs.unlinkSync(localFilePath);
-
-    }
-
-    if (coverFile) {
-      const localFilePath = coverFile.path;
-
-      const result = await cloudinary.uploader.upload(localFilePath, {
-        folder: `users/${userId}/cover`,
-      });
-
-      coverPictureURL = result.secure_url; 
-
-      fs.unlinkSync(localFilePath);
-
-    }
-
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-      });
-    }
-
-    if (username) user.username = username;
-    if (fullname) user.fullname = fullname;
-    if (bio) user.bio = bio;
-    if (location) user.location = location;
-    if (website) user.website = website;
-    if (dob) user.dob = dob;
-    if(profilePictureURL) user.profilePicture = profilePictureURL;
-    if(coverPictureURL) user.coverPicture = coverPictureURL;
-
-    await user.save();
-
-    const userData = user.toObject();
-    delete userData.password;
-
-    return res.status(200).json({
-      message: "Profile updated Successfully",
-      success: true,
-      userData,
+  return res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        userData
     });
-  } catch (error) {
-    console.log(`Error while updating the profile: ${error.message}`);
-    return res.status(500).json({
-      message: "Internal Server error",
-      success: false,
-    });
-  }
 };
 
 export const getUserProfile = async (req, res) => {
-  try {
-    const loggedInUserId = req.id;
-    const profileUserId = req.params.id;
+  const userData = await _getUserProfileService({loggedInUserId: req.id, profileUserId: req.params.id});
 
-    const user = await User.findById(profileUserId).select("-password");
+  return res.status(200).json({
+    success:true,
+    message: "fetched user",
+    userData
+  });
+  // try {
+  //   const loggedInUserId = req.id;
+  //   const profileUserId = req.params.id;
 
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found!",
-        success: false,
-      });
-    }
+  //   const user = await User.findById(profileUserId).select("-password");
 
-    const posts = await Post.find({ createdBy: profileUserId })
-      .sort({
-        createdAt: -1,
-      })
-      .populate("createdBy", "username fullname profilePicture");
+  //   if (!user) {
+  //     return res.status(404).json({
+  //       message: "User not found!",
+  //       success: false,
+  //     });
+  //   }
 
-    const isOwnProfile = loggedInUserId === profileUserId;
+  //   const posts = await Post.find({ createdBy: profileUserId })
+  //     .sort({
+  //       createdAt: -1,
+  //     })
+  //     .populate("createdBy", "username fullname profilePicture");
 
-    const isFollowing = user.followers?.includes(loggedInUserId);
+  //   const isOwnProfile = loggedInUserId === profileUserId;
 
-    return res.status(200).json({
-      success: true,
-      user,
-      posts,
-      isOwnProfile,
-      isFollowing,
-      message: "User profile fetched successfully!",
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-      success: false,
-    });
-  }
+  //   const isFollowing = user.followers?.includes(loggedInUserId);
+
+  //   return res.status(200).json({
+  //     success: true,
+  //     user,
+  //     posts,
+  //     isOwnProfile,
+  //     isFollowing,
+  //     message: "User profile fetched successfully!",
+  //   });
+  // } catch (error) {
+  //   res.status(500).json({
+  //     message: "Internal Server Error",
+  //     success: false,
+  //   });
+  // }
 };
 
 export const searchUser = async (req, res) => {
