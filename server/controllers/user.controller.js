@@ -9,7 +9,8 @@ import { v2 as cloudinary } from "cloudinary";
 import {
   getMeService as _getMeService,
   updateProfileService as _updateProfileService,
-  getUserProfileService as _getUserProfileService
+  getUserProfileService as _getUserProfileService,
+  searchUserService as _searchUserService,
 } from "../services/user.service.js";
 
 export const signUp = async (req, res) => {
@@ -172,19 +173,22 @@ export const updateProfile = async (req, res) => {
   });
 
   return res.status(200).json({
-        success: true,
-        message: "Profile updated successfully",
-        userData
-    });
+    success: true,
+    message: "Profile updated successfully",
+    userData,
+  });
 };
 
 export const getUserProfile = async (req, res) => {
-  const userData = await _getUserProfileService({loggedInUserId: req.id, profileUserId: req.params.id});
+  const userData = await _getUserProfileService({
+    loggedInUserId: req.id,
+    profileUserId: req.params.id,
+  });
 
   return res.status(200).json({
-    success:true,
+    success: true,
     message: "fetched user",
-    userData
+    userData,
   });
   // try {
   //   const loggedInUserId = req.id;
@@ -226,36 +230,14 @@ export const getUserProfile = async (req, res) => {
 };
 
 export const searchUser = async (req, res) => {
-  try {
-    const { query } = req.query;
-
-    if (!query || query.trim() === "") {
-      return res.status(200).json({
-        success: true,
-        user: [],
-      });
-    }
-
-    const users = await User.find({
-      $or: [
-        { username: { $regex: query, $options: "i" } },
-        { fullname: { $regex: query, $options: "i" } },
-      ],
-    })
-      .select("_id username fullname profilePicture bio")
-      .limit(10);
-
-    return res.status(200).json({
-      success: true,
-      users,
-      message: "User search results fetched successfully!",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
+  const query = req.query;
+  const users = await _searchUserService(query);
+  
+  return res.status(200).json({
+    success: true,
+    users,
+    message: "User search results fetched successfully!",
+  });
 };
 
 export const followUser = async (req, res) => {

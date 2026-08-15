@@ -73,34 +73,45 @@ export const updateProfileService = async ({
   return userData;
 };
 
-export const getUserProfileService = async (
-  {
-    loggedInUserId,
-    profileUserId
-  }) => {
-    const user = await User.findById(profileUserId).select("-password");
+export const getUserProfileService = async ({
+  loggedInUserId,
+  profileUserId,
+}) => {
+  const user = await User.findById(profileUserId).select("-password");
 
-    if (!user) {
-      notFound("User not found!");
-    }
+  if (!user) {
+    notFound("User not found!");
+  }
 
-    const posts = await Post.find({ createdBy: profileUserId })
-      .sort({
-        createdAt: -1,
-      })
-      .populate("createdBy", "username fullname profilePicture");
+  const posts = await Post.find({ createdBy: profileUserId })
+    .sort({
+      createdAt: -1,
+    })
+    .populate("createdBy", "username fullname profilePicture");
 
-    const isOwnProfile = loggedInUserId === profileUserId;
+  const isOwnProfile = loggedInUserId === profileUserId;
 
-    const isFollowing = user.followers?.includes(loggedInUserId);
+  const isFollowing = user.followers?.includes(loggedInUserId);
 
-    return{
-      success: true,
-      user,
-      posts,
-      isOwnProfile,
-      isFollowing,
-      message: "User profile fetched successfully!",
-    };
+  return {
+    success: true,
+    user,
+    posts,
+    isOwnProfile,
+    isFollowing,
+    message: "User profile fetched successfully!",
+  };
 };
 
+export const searchUserService = async ({ query }) => {
+  const users = await User.find({
+    $or: [
+      { username: { $regex: query, $options: "i" } },
+      { fullname: { $regex: query, $options: "i" } },
+    ],
+  })
+    .select("_id username fullname profilePicture bio")
+    .limit(10);
+
+  return users;
+};
