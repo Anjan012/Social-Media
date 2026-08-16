@@ -1,5 +1,5 @@
 import express from "express";
-import { signIn, signUp, logout, updateProfile, getUserProfile, getMe, searchUser, followUser } from "../controllers/user.controller.js";
+import { signIn, signUp, logout, updateProfile, getUserProfile, getMe, searchUser, followUser, resetPassword } from "../controllers/user.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
 import { uploadProfileAndCover } from "../utils/profileMulterConfig.js";
 import { forgetPassword } from "../controllers/user.controller.js";
@@ -25,6 +25,8 @@ router.route('/users/:id/follow').post(isAuthenticated, followUser);
 
 // password 
 router.route('/forgetPassword').post(forgetPassword);
+router.route('/resetPassword/:token').post(resetPassword);
+
 
 
 

@@ -14,7 +14,8 @@ import {
 } from "../services/user.service.js";
 
 import {
-  forgetPasswordService as _forgetPasswordService
+  forgetPasswordService as _forgetPasswordService,
+  resetpasswordService as _resetpasswordService
 } from "../services/forgetPassword.service.js"
 
 export const signUp = async (req, res) => {
@@ -312,5 +313,16 @@ export const forgetPassword = async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "If the email exist you will receive the link in your mail"
+  });
+};
+
+export const resetPassword = async (req, res) => {
+  const token = req.params.token;
+
+  const data = await _resetpasswordService({token});
+
+  return res.status(200).json({
+    success:true,
+    message: "password reset sucessfull"
   });
 };

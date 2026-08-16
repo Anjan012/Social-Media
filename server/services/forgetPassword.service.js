@@ -2,7 +2,7 @@ import { User } from "../models/user.model.js";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { internalServerError, notFound } from "../utils/error/error-helper.js";
+import { internalServerError, notFound, unauthorized } from "../utils/error/error-helper.js";
 
 export const forgetPasswordService = async ({ email }) => {
   const user = await User.findOne({ email });
@@ -48,6 +48,28 @@ export const forgetPasswordService = async ({ email }) => {
   };
 };
 
-export const resetpassword = async () => {
-    
+export const resetpasswordService = async ({token}) => {
+    const decodedToken = jwt.verify(
+        token,
+        process.env.JWT_SECRET_KEY
+    );
+
+    if(!decodedToken) {
+        unauthorized("Invalid Token");
+    }
+
+    const user = await User.findOne({_id: decodedToken.userId});
+
+    if(!user) {
+        notFound("User not Found!");
+    }
+
+    const newPassword = req.body.newPassword;
+
+    const salt = await bcrypt.genSalt(10);
+    newPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = newPassword;
+
+    await user.save();
 };
