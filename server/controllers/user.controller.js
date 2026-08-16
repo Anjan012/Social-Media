@@ -318,8 +318,9 @@ export const forgetPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   const token = req.params.token;
+  const {newPassword} = req.body;
 
-  const data = await _resetpasswordService({token});
+  const data = await _resetpasswordService({token, newPassword});
 
   return res.status(200).json({
     success:true,
