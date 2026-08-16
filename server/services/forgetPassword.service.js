@@ -48,4 +48,6 @@ export const forgetPasswordService = async ({ email }) => {
   };
 };
 
-export const resetpassword = async () => {};
+export const resetpassword = async () => {
+    
+};

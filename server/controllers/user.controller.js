@@ -309,5 +309,8 @@ export const forgetPassword = async (req, res) => {
 
   const data = await _forgetPasswordService({email});
 
-  return data;
-}
+  return res.status(200).json({
+    success: true,
+    message: "If the email exist you will receive the link in your mail"
+  });
+};
