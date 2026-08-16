@@ -9,6 +9,7 @@ import { CommentPage } from "./pages/comment/index";
 import SearchPage from "./pages/search/SearchPage";
 import { ProtectedRoutes } from "./utils/ProtectedRoutes";
 import ForgotPassword from "./pages/forget-password/ForgotPassword";
+import ResetPassword from "./pages/forget-password/ResetPassword";
 
 const appRouter = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/forgot-password",
     element: <ForgotPassword />,
+  },
+  {
+    path: "/reset-password/:token",
+    element: <ResetPassword />,
   },
 
   // ← All protected routes go inside this layout

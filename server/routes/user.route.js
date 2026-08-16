@@ -25,7 +25,7 @@ router.route('/users/:id/follow').post(isAuthenticated, followUser);
 
 // password 
 router.route('/users/forgot-password').post(forgetPassword);
-router.route('/users/resetPassword/:token').post(resetPassword);
+router.route('/users/reset-password/:token').post(resetPassword);
 
 
 
