@@ -13,6 +13,10 @@ import {
   searchUserService as _searchUserService,
 } from "../services/user.service.js";
 
+import {
+  forgetPasswordService as _forgetPasswordService
+} from "../services/forgetPassword.service.js"
+
 export const signUp = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -298,3 +302,12 @@ export const followUser = async (req, res) => {
     });
   }
 };
+
+
+export const forgetPassword = async (req, res) => {
+  const {email} = req.body;
+
+  const data = await _forgetPasswordService({email});
+
+  return data;
+}
