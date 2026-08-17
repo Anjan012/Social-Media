@@ -17,6 +17,7 @@ import {
   forgetPasswordService as _forgetPasswordService,
   resetpasswordService as _resetpasswordService
 } from "../services/forgetPassword.service.js"
+import { asyncHandler } from "../utils/async-handler.js";
 
 export const signUp = async (req, res) => {
   try {
@@ -159,7 +160,7 @@ export const logout = async (req, res) => {
   }
 };
 
-export const getMe = async (req, res) => {
+export const getMe = asyncHandler(async (req, res) => {
   const user = await _getMeService(req.id);
 
   return res.status(200).json({
@@ -167,9 +168,9 @@ export const getMe = async (req, res) => {
     user,
     message: "User profile fetched successfully!",
   });
-};
+});
 
-export const updateProfile = async (req, res) => {
+export const updateProfile = asyncHandler (async (req, res) => {
   const userData = await _updateProfileService({
     userId: req.id,
     ...req.body,
@@ -182,9 +183,9 @@ export const updateProfile = async (req, res) => {
     message: "Profile updated successfully",
     userData,
   });
-};
+});
 
-export const getUserProfile = async (req, res) => {
+export const getUserProfile = asyncHandler(async (req, res) => {
   const userData = await _getUserProfileService({
     loggedInUserId: req.id,
     profileUserId: req.params.id,
@@ -195,46 +196,9 @@ export const getUserProfile = async (req, res) => {
     message: "fetched user",
     userData,
   });
-  // try {
-  //   const loggedInUserId = req.id;
-  //   const profileUserId = req.params.id;
+});
 
-  //   const user = await User.findById(profileUserId).select("-password");
-
-  //   if (!user) {
-  //     return res.status(404).json({
-  //       message: "User not found!",
-  //       success: false,
-  //     });
-  //   }
-
-  //   const posts = await Post.find({ createdBy: profileUserId })
-  //     .sort({
-  //       createdAt: -1,
-  //     })
-  //     .populate("createdBy", "username fullname profilePicture");
-
-  //   const isOwnProfile = loggedInUserId === profileUserId;
-
-  //   const isFollowing = user.followers?.includes(loggedInUserId);
-
-  //   return res.status(200).json({
-  //     success: true,
-  //     user,
-  //     posts,
-  //     isOwnProfile,
-  //     isFollowing,
-  //     message: "User profile fetched successfully!",
-  //   });
-  // } catch (error) {
-  //   res.status(500).json({
-  //     message: "Internal Server Error",
-  //     success: false,
-  //   });
-  // }
-};
-
-export const searchUser = async (req, res) => {
+export const searchUser = asyncHandler(async (req, res) => {
   const query = req.query;
   const users = await _searchUserService(query);
   
@@ -243,7 +207,7 @@ export const searchUser = async (req, res) => {
     users,
     message: "User search results fetched successfully!",
   });
-};
+});
 
 export const followUser = async (req, res) => {
   try {
@@ -305,7 +269,7 @@ export const followUser = async (req, res) => {
 };
 
 
-export const forgetPassword = async (req, res) => {
+export const forgetPassword = asyncHandler(async (req, res) => {
   const {email} = req.body;
 
   const data = await _forgetPasswordService({email});
@@ -314,9 +278,9 @@ export const forgetPassword = async (req, res) => {
     success: true,
     message: "If the email exist you will receive the link in your mail"
   });
-};
+});
 
-export const resetPassword = async (req, res) => {
+export const resetPassword = asyncHandler(async (req, res) => {
   const token = req.params.token;
   const {newPassword} = req.body;
 
@@ -326,4 +290,4 @@ export const resetPassword = async (req, res) => {
     success:true,
     message: "password reset sucessfull"
   });
-};
+});
