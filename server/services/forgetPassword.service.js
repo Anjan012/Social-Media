@@ -2,49 +2,94 @@ import { User } from "../models/user.model.js";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { transporter } from "../config/mail.js";
 import {
   internalServerError,
   notFound,
   unauthorized,
 } from "../utils/error/error-helper.js";
 
+
+const PASSWORD_RESET_TTL_MS = 10 * 60 * 1000;
+
+const GENERIC_MESSAGE = "If an account exists with this email, a reset link has been sent.";
+
 export const forgetPasswordService = async ({ email }) => {
-  const user = await User.findOne({ email });
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await User.findOne({ email: normalizedEmail });
 
   if (!user) {
-    notFound("User not Found!");
+    return {
+      message: GENERIC_MESSAGE,
+    };
   }
 
   // generate token
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: "10m",
-  });
+  const resetToken = crypto.randomBytes(32).toString("hex");
 
-  //sendmail
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.PASSWORD_APP_EMAIL,
-    },
-  });
+  // Never store the raw token
+  const resetTokenHash = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  const resetTokenExpires = new Date(Date.now() + PASSWORD_RESET_TTL_MS);
+
+  user.passwordResetTokenHash = resetTokenHash;
+  user.passwordResetExpires = resetTokenExpires;
+
+  await user.save();
 
   const mailOptions = {
     from: process.env.EMAIL,
-    to: email,
-    subject: "Reset Password",
-    html: `<h1>Reset Your Password</h1>
-                <p>Click on the following link to reset your password:</p>
-                <a href="http://localhost:5173/reset-password/${token}">http://localhost:5173/reset-password/${token}</a>
-                <p>The link will expire in 10 minutes.</p>
-                <p>If you didn't request a password reset, please ignore this email.</p>`,
+    to: normalizedEmail,
+    subject: "Reset your password",
+
+    text: [
+      "You requested a password reset.",
+      "",
+      `Reset your password: ${resetUrl}`,
+      "",
+      "This link expires in 10 minutes.",
+      "",
+      "If you did not request this, you can safely ignore this email.",
+    ].join("\n"),
+
+    html: `
+      <h1>Reset Your Password</h1>
+
+      <p>
+        You requested a password reset for your account.
+      </p>
+
+      <p>
+        <a href="${resetUrl}">
+          Reset your password
+        </a>
+      </p>
+
+      <p>
+        This link expires in 10 minutes.
+      </p>
+
+      <p>
+        If you did not request this password reset,
+        you can safely ignore this email.
+      </p>
+    `,
   };
 
   try {
     await transporter.sendMail(mailOptions);
   } catch (err) {
-    console.error("Nodemailer error:", err);
-    internalServerError(err.message);
+    // we should not leave an unusable reset token behind 
+    user.passwordResetTokenHash = null;
+    user.passwordResetExpires = null;
+
+    await user.save();
+
+    throw error;
   }
 
   return {
@@ -53,7 +98,7 @@ export const forgetPasswordService = async ({ email }) => {
 };
 
 export const resetpasswordService = async ({ token, newPassword }) => {
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  const decodedToken = jwt.verify(token, process.env.PASSWORD_RESET_SECRET);
 
   if (!decodedToken) {
     unauthorized("Invalid Token");
