@@ -10,10 +10,10 @@ import {
   unauthorized,
 } from "../utils/error/error-helper.js";
 
-
 const PASSWORD_RESET_TTL_MS = 10 * 60 * 1000;
 
-const GENERIC_MESSAGE = "If an account exists with this email, a reset link has been sent.";
+const GENERIC_MESSAGE =
+  "If an account exists with this email, a reset link has been sent.";
 
 export const forgetPasswordService = async ({ email }) => {
   const normalizedEmail = email.trim().toLowerCase();
@@ -40,6 +40,8 @@ export const forgetPasswordService = async ({ email }) => {
   user.passwordResetExpires = resetTokenExpires;
 
   await user.save();
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
   const mailOptions = {
     from: process.env.EMAIL,
@@ -83,7 +85,7 @@ export const forgetPasswordService = async ({ email }) => {
   try {
     await transporter.sendMail(mailOptions);
   } catch (err) {
-    // we should not leave an unusable reset token behind 
+    // we should not leave an unusable reset token behind
     user.passwordResetTokenHash = null;
     user.passwordResetExpires = null;
 
