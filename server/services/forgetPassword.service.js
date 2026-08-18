@@ -100,22 +100,25 @@ export const forgetPasswordService = async ({ email }) => {
 };
 
 export const resetpasswordService = async ({ token, newPassword }) => {
-  const decodedToken = jwt.verify(token, process.env.PASSWORD_RESET_SECRET);
 
-  if (!decodedToken) {
-    unauthorized("Invalid Token");
-  }
+  const resetTokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
-  const user = await User.findOne({ _id: decodedToken.userId });
+  const user = await User.findOne({
+    passwordResetTokenHash: resetTokenHash,
+    passwordResetExpires: {$gt: new Date()},
+  });
 
   if (!user) {
-    notFound("User not Found!");
+    unauthorized("Invalid or expired reset token");
   }
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(newPassword, salt);
 
   user.password = hashedPassword;
+
+  user.passwordResetTokenHash = null;
+  user.passwordResetExpires = null;
 
   await user.save();
 };
