@@ -91,7 +91,7 @@ export const forgetPasswordService = async ({ email }) => {
 
     await user.save();
 
-    throw error;
+    throw internalServerError(err.message);
   }
 
   return {
