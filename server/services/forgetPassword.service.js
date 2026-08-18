@@ -1,12 +1,9 @@
 import { User } from "../models/user.model.js";
-import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { transporter } from "../config/mail.js";
 import {
   internalServerError,
-  notFound,
   unauthorized,
 } from "../utils/error/error-helper.js";
 
