@@ -6,14 +6,56 @@ import {
   internalServerError,
   unauthorized,
 } from "../utils/error/error-helper.js";
+import {
+  consumeRateLimit,
+  createSafeidentifier,
+} from "./rate-limit.service.js";
 
 const PASSWORD_RESET_TTL_MS = 10 * 60 * 1000;
 
 const GENERIC_MESSAGE =
   "If an account exists with this email, a reset link has been sent.";
 
-export const forgetPasswordService = async ({ email }) => {
+// Password reset policy
+
+const EMAIL_LIMIT = 1;
+const EMAIL_WINDOW_MS = 10 * 60 * 1000;
+
+const IP_LIMIT = 10;
+const IP_WINDOW_MS = 15 * 60 * 1000;
+
+export const forgetPasswordService = async ({ email, ip }) => {
   const normalizedEmail = email.trim().toLowerCase();
+
+  const emailIdentifier = createSafeidentifier(normalizedEmail);
+  const ipIdentifier = createSafeidentifier(ip);
+
+  const ipLimit = await consumeRateLimit({
+    scope: "password-reset:ip",
+    identifier: ipIdentifier,
+    limit: IP_LIMIT,
+    windowMs: IP_WINDOW_MS,
+  });
+
+  if (!ipLimit.allowed) {
+    return {
+      message: "Too many requests. Please try again later.",
+      rateLimited: true,
+      retryAfterSeconds: ipLimit.retryAfterSeconds,
+    };
+  }
+
+  const emailLimit = await consumeRateLimit({
+    scope: "password-reset:email",
+    identifier: emailIdentifier,
+    limit: EMAIL_LIMIT,
+    windowMs: EMAIL_WINDOW_MS,
+  });
+
+  if (!emailLimit.allowed) {
+    return { message: GENERIC_MESSAGE };
+  }
+
   const user = await User.findOne({ email: normalizedEmail });
 
   if (!user) {
@@ -97,12 +139,14 @@ export const forgetPasswordService = async ({ email }) => {
 };
 
 export const resetpasswordService = async ({ token, newPassword }) => {
-
-  const resetTokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  const resetTokenHash = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
 
   const user = await User.findOne({
     passwordResetTokenHash: resetTokenHash,
-    passwordResetExpires: {$gt: new Date()},
+    passwordResetExpires: { $gt: new Date() },
   });
 
   if (!user) {

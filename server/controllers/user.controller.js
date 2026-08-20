@@ -15,8 +15,8 @@ import {
 
 import {
   forgetPasswordService as _forgetPasswordService,
-  resetpasswordService as _resetpasswordService
-} from "../services/forgetPassword.service.js"
+  resetpasswordService as _resetpasswordService,
+} from "../services/forgetPassword.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
 export const signUp = async (req, res) => {
@@ -170,7 +170,7 @@ export const getMe = asyncHandler(async (req, res) => {
   });
 });
 
-export const updateProfile = asyncHandler (async (req, res) => {
+export const updateProfile = asyncHandler(async (req, res) => {
   const userData = await _updateProfileService({
     userId: req.id,
     ...req.body,
@@ -201,7 +201,7 @@ export const getUserProfile = asyncHandler(async (req, res) => {
 export const searchUser = asyncHandler(async (req, res) => {
   const query = req.query;
   const users = await _searchUserService(query);
-  
+
   return res.status(200).json({
     success: true,
     users,
@@ -268,26 +268,34 @@ export const followUser = async (req, res) => {
   }
 };
 
-
 export const forgetPassword = asyncHandler(async (req, res) => {
-  const {email} = req.body;
+  const result = await forgetPasswordService({
+    email: req.body.email,
+    ip: req.ip,
+  });
 
-  const data = await _forgetPasswordService({email});
+  if (result.rateLimited) {
+    res.set("Retry-After", String(result.retryAfterSeconds));
+
+    return res.status(429).json({
+      message: result.message,
+    });
+  }
 
   return res.status(200).json({
     success: true,
-    message: "If the email exist you will receive the link in your mail"
+    message: "If the email exist you will receive the link in your mail",
   });
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
   const token = req.params.token;
-  const {newPassword} = req.body;
+  const { newPassword } = req.body;
 
-  const data = await _resetpasswordService({token, newPassword});
+  const data = await _resetpasswordService({ token, newPassword });
 
   return res.status(200).json({
-    success:true,
-    message: "password reset sucessfull"
+    success: true,
+    message: "password reset sucessfull",
   });
 });
