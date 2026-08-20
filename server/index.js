@@ -19,6 +19,14 @@ console.log("Cloudinary configured with:", process.env.CLOUD_NAME ? "OK" : "Miss
 
 const app = express();
 
+const trustProxyHops = Number.parseInt(process.env.TRUST_PROXY_HOPS || "0", 10);
+app.set(
+    "trust proxy",
+    Number.isInteger(trustProxyHops) && trustProxyHops > 0
+        ? trustProxyHops
+        : false
+);
+
 
 // const corsOptions = {
 //     // origin: "http://localhost:5173", // allow requests from this origin

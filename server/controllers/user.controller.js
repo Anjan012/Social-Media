@@ -269,13 +269,10 @@ export const followUser = async (req, res) => {
 };
 
 export const forgetPassword = asyncHandler(async (req, res) => {
-  console.log(req.ip)
   const result = await _forgetPasswordService({
-    email: req.body.email,
+    email: req.body?.email,
     ip: req.ip,
   });
-
-  console.log(result)
 
   if (result.rateLimited) {
     res.set("Retry-After", String(result.retryAfterSeconds));
@@ -293,9 +290,9 @@ export const forgetPassword = asyncHandler(async (req, res) => {
 
 export const resetPassword = asyncHandler(async (req, res) => {
   const token = req.params.token;
-  const { newPassword } = req.body;
+  const { newPassword } = req.body || {};
 
-  const data = await _resetpasswordService({ token, newPassword });
+  await _resetpasswordService({ token, newPassword });
 
   return res.status(200).json({
     success: true,
