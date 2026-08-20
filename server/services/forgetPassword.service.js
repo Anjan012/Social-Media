@@ -92,7 +92,7 @@ export const forgetPasswordService = async ({ email }) => {
   }
 
   return {
-    message: "Email Sent",
+    message: GENERIC_MESSAGE,
   };
 };
 
