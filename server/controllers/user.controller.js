@@ -275,6 +275,8 @@ export const forgetPassword = asyncHandler(async (req, res) => {
     ip: req.ip,
   });
 
+  console.log(result)
+
   if (result.rateLimited) {
     res.set("Retry-After", String(result.retryAfterSeconds));
 
@@ -285,7 +287,7 @@ export const forgetPassword = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    message: "If the email exist you will receive the link in your mail",
+    message: result.message,
   });
 });
 

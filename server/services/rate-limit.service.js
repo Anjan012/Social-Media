@@ -12,7 +12,7 @@ function getWindow(now, windowMs) {
 
 export function createSafeidentifier(value) {
   return crypto
-    .createHash("sha256", process.env.RATE_LIMIT_SECRET)
+    .createHmac("sha256", process.env.RATE_LIMIT_SECRET)
     .update(value)
     .digest("hex");
 }
