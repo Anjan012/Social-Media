@@ -269,7 +269,8 @@ export const followUser = async (req, res) => {
 };
 
 export const forgetPassword = asyncHandler(async (req, res) => {
-  const result = await forgetPasswordService({
+  console.log(req.ip)
+  const result = await _forgetPasswordService({
     email: req.body.email,
     ip: req.ip,
   });

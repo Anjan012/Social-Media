@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { PasswordResetRateLimit } from "../models/passwordResetRateLimit.model";
+import { PasswordResetRateLimit } from "../models/passwordResetRateLimit.model.js";
 
 function getWindow(now, windowMs) {
   const startAtMs = Math.floor(now.getTime() / windowMs) * windowMs;
@@ -21,7 +21,7 @@ export async function consumeRateLimit({ scope, identifier, limit, windowMs }) {
   const now = new Date();
   const { startAt, expiresAt } = getWindow(now, windowMs);
 
-  const key = `${scope}:${identifier}:${startsAt.toISOString()}`;
+  const key = `${scope}:${identifier}:${startAt.toISOString()}`;
 
   let record;
 
@@ -51,6 +51,6 @@ export async function consumeRateLimit({ scope, identifier, limit, windowMs }) {
   return {
     allowed: record.count <= limit,
     remaining: Math.max(0, limit - record.count),
-    retryAfterSeconds: Math.ceil((expiredAt.getTime() - now.getTime()) / 1000),
+    retryAfterSeconds: Math.ceil((expiresAt.getTime() - now.getTime()) / 1000),
   };
 }
