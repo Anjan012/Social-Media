@@ -31,6 +31,13 @@ import { Link } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+function formatDate(date) {
+  return new Date(date).toLocaleString("en-US", {
+    dateStyle: "long",
+    timeStyle: "short",
+  });
+}
+
 export const Home = () => {
   const { authUser } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
@@ -160,7 +167,7 @@ export const Home = () => {
                         </p>
                       </Link>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        @{post.createdBy.fullname} • {post.createdAt}
+                        @{post.createdBy.fullname} • {formatDate(post.createdAt)}
                       </p>
                     </div>
                   </div>
