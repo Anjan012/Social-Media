@@ -28,15 +28,9 @@ import {
 } from "lucide-react";
 import { PostBox } from "./shared/Postbox";
 import { Link } from "react-router-dom";
+import { formatDate } from "../lib/formatter";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-function formatDate(date) {
-  return new Date(date).toLocaleString("en-US", {
-    dateStyle: "long",
-    timeStyle: "short",
-  });
-}
 
 export const Home = () => {
   const { authUser } = useContext(AuthContext);

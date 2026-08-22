@@ -28,6 +28,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../../../context/AuthContext";
+import { formatDate } from "../../../lib/formatter";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -129,7 +130,7 @@ export const ProfilePost = (
                                         </p>
                                     </Link>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        @{post.createdBy.fullname} • {post.createdAt}
+                                        @{post.createdBy.fullname} • {formatDate(post.createdAt)}
                                     </p>
                                 </div>
                             </div>
