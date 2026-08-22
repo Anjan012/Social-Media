@@ -23,9 +23,13 @@ export function Profile() {
 
     const getProfile = async () => {
       const response = await axios.get(PROFILE_URL, { withCredentials: true });
-      setProfileData(response.data);
-      setUser(response.data.user);
-      setPosts(response.data.posts);
+      // setProfileData(response.data);
+      // setUser(response.data.user);
+      // setPosts(response.data.posts);
+      // console.log(response.data);
+      setProfileData(response.data.userData);
+      setUser(response.data.userData.user);
+      setPosts(response.data.userData.posts);
     };
 
     getProfile();

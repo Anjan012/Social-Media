@@ -31,7 +31,6 @@ const SearchPage = () => {
                     `${API_URL}/api/v1/users/search?query=${searchQuery}`,
                     { withCredentials: true }
                 );
-
                 setSearchResults(res.data.users);
 
             } catch (error) {

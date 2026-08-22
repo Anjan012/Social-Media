@@ -54,6 +54,19 @@ const userSchema = new mongoose.Schema(
 
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    passwordResetTokenHash: {
+      type: String,
+      default: null,
+    },
+
+    passwordResetExpires: {
+      type: Date,
+      default: null,
+    },
+    passwordResetRequestedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -61,5 +74,3 @@ const userSchema = new mongoose.Schema(
 );
 
 export const User = mongoose.model("User", userSchema);
-
-

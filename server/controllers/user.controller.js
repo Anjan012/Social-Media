@@ -1,10 +1,23 @@
+// a controller job is to get data request call service and send repsonse
+
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Post } from "../models/post.model.js";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
-import { profile } from "console";
+import {
+  getMeService as _getMeService,
+  updateProfileService as _updateProfileService,
+  getUserProfileService as _getUserProfileService,
+  searchUserService as _searchUserService,
+} from "../services/user.service.js";
+
+import {
+  forgetPasswordService as _forgetPasswordService,
+  resetpasswordService as _resetpasswordService,
+} from "../services/forgetPassword.service.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
 export const signUp = async (req, res) => {
   try {
@@ -147,176 +160,54 @@ export const logout = async (req, res) => {
   }
 };
 
-export const getMe = async (req, res) => {
-  const loggedInId = req.id;
-
-  const user = await User.findById(loggedInId).select("-password");
-
-  if (!user) {
-    return res.status(404).json({
-      message: "User not found!",
-      success: false,
-    });
-  }
+export const getMe = asyncHandler(async (req, res) => {
+  const user = await _getMeService(req.id);
 
   return res.status(200).json({
     success: true,
     user,
     message: "User profile fetched successfully!",
   });
-};
+});
 
-export const updateProfile = async (req, res) => {
-  try {
-    const { username, fullname, bio, location, website, dob } = req.body;
-    const file = req.file;
+export const updateProfile = asyncHandler(async (req, res) => {
+  const userData = await _updateProfileService({
+    userId: req.id,
+    ...req.body,
+    profileFile: req.files?.profilePicture?.[0],
+    coverFile: req.files?.coverPicture?.[0],
+  });
 
-    // cloudinary will come here....
+  return res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
+    userData,
+  });
+});
 
-    const profileFile = req.files?.profilePicture?.[0];  
-    const coverFile   = req.files?.coverPicture?.[0];
+export const getUserProfile = asyncHandler(async (req, res) => {
+  const userData = await _getUserProfileService({
+    loggedInUserId: req.id,
+    profileUserId: req.params.id,
+  });
 
-    const userId = req.id; 
+  return res.status(200).json({
+    success: true,
+    message: "fetched user",
+    userData,
+  });
+});
 
-    let profilePictureURL = null;
-    let coverPictureURL   = null;
+export const searchUser = asyncHandler(async (req, res) => {
+  const query = req.query;
+  const users = await _searchUserService(query);
 
-    if (profileFile) {
-      const localFilePath = profileFile.path;
-
-      const result = await cloudinary.uploader.upload(localFilePath, {
-        folder: `users/${userId}/profile`,
-      });
-
-      profilePictureURL = result.secure_url; 
-
-      fs.unlinkSync(localFilePath);
-
-    }
-
-    if (coverFile) {
-      const localFilePath = coverFile.path;
-
-      const result = await cloudinary.uploader.upload(localFilePath, {
-        folder: `users/${userId}/cover`,
-      });
-
-      coverPictureURL = result.secure_url; 
-
-      fs.unlinkSync(localFilePath);
-
-    }
-
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-      });
-    }
-
-    if (username) user.username = username;
-    if (fullname) user.fullname = fullname;
-    if (bio) user.bio = bio;
-    if (location) user.location = location;
-    if (website) user.website = website;
-    if (dob) user.dob = dob;
-    if(profilePictureURL) user.profilePicture = profilePictureURL;
-    if(coverPictureURL) user.coverPicture = coverPictureURL;
-
-    await user.save();
-
-    const userData = user.toObject();
-    delete userData.password;
-
-    return res.status(200).json({
-      message: "Profile updated Successfully",
-      success: true,
-      userData,
-    });
-  } catch (error) {
-    console.log(`Error while updating the profile: ${error.message}`);
-    return res.status(500).json({
-      message: "Internal Server error",
-      success: false,
-    });
-  }
-};
-
-export const getUserProfile = async (req, res) => {
-  try {
-    const loggedInUserId = req.id;
-    const profileUserId = req.params.id;
-
-    const user = await User.findById(profileUserId).select("-password");
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found!",
-        success: false,
-      });
-    }
-
-    const posts = await Post.find({ createdBy: profileUserId })
-      .sort({
-        createdAt: -1,
-      })
-      .populate("createdBy", "username fullname profilePicture");
-
-    const isOwnProfile = loggedInUserId === profileUserId;
-
-    const isFollowing = user.followers?.includes(loggedInUserId);
-
-    return res.status(200).json({
-      success: true,
-      user,
-      posts,
-      isOwnProfile,
-      isFollowing,
-      message: "User profile fetched successfully!",
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-      success: false,
-    });
-  }
-};
-
-export const searchUser = async (req, res) => {
-  try {
-    const { query } = req.query;
-
-    if (!query || query.trim() === "") {
-      return res.status(200).json({
-        success: true,
-        user: [],
-      });
-    }
-
-    const users = await User.find({
-      $or: [
-        { username: { $regex: query, $options: "i" } },
-        { fullname: { $regex: query, $options: "i" } },
-      ],
-    })
-      .select("_id username fullname profilePicture bio")
-      .limit(10);
-
-    return res.status(200).json({
-      success: true,
-      users,
-      message: "User search results fetched successfully!",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-};
+  return res.status(200).json({
+    success: true,
+    users,
+    message: "User search results fetched successfully!",
+  });
+});
 
 export const followUser = async (req, res) => {
   try {
@@ -376,3 +267,35 @@ export const followUser = async (req, res) => {
     });
   }
 };
+
+export const forgetPassword = asyncHandler(async (req, res) => {
+  const result = await _forgetPasswordService({
+    email: req.body?.email,
+    ip: req.ip,
+  });
+
+  if (result.rateLimited) {
+    res.set("Retry-After", String(result.retryAfterSeconds));
+
+    return res.status(429).json({
+      message: result.message,
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: result.message,
+  });
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const token = req.params.token;
+  const { newPassword } = req.body || {};
+
+  await _resetpasswordService({ token, newPassword });
+
+  return res.status(200).json({
+    success: true,
+    message: "password reset sucessfull",
+  });
+});

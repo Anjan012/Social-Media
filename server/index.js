@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import userRoutes from './routes/user.route.js';
 import postRoutes from './routes/post.route.js';
 import path from "path";
+import { errorHandler } from './middlewares/error.middleware.js';
 
 dotenv.config();
 import { v2 as cloudinary } from "cloudinary";
@@ -17,6 +18,14 @@ cloudinary.config({
 console.log("Cloudinary configured with:", process.env.CLOUD_NAME ? "OK" : "Missing keys");
 
 const app = express();
+
+const trustProxyHops = Number.parseInt(process.env.TRUST_PROXY_HOPS || "0", 10);
+app.set(
+    "trust proxy",
+    Number.isInteger(trustProxyHops) && trustProxyHops > 0
+        ? trustProxyHops
+        : false
+);
 
 
 // const corsOptions = {
@@ -85,3 +94,5 @@ connectDB().then(() => {
     console.error("Failed to start the server due to DB connection issue", err);
 });
 
+
+app.use(errorHandler);
