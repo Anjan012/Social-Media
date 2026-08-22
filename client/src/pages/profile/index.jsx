@@ -62,10 +62,15 @@ export function Profile() {
           <div className="h-32 sm:h-48 md:h-56 bg-linear-to-r from-red-400/20 to-purple-500/20 relative" />
         )}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ProfileSection profileData={profileData} user={user} />
+          <ProfileSection profileData={profileData} user={user} loading={loading} />
           <ProfileTab />
           <PostBox />
-          <ProfilePost posts={posts} user={user} profileData={profileData} />
+          <ProfilePost
+            posts={posts}
+            user={user}
+            profileData={profileData}
+            loading={loading}
+          />
         </div>
       </div >
     </>
