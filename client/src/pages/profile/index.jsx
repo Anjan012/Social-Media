@@ -8,6 +8,7 @@ import { ProfileTab } from "./profile-page/ProfileTab";
 import { PostBox } from "../shared/Postbox";
 import { ProfilePost } from "./profile-page/ProfilePost";
 import { ProfileSectionSkeleton } from "./skeleton/ProfileSectionSkeleton";
+import { ProfilePostSkeleton } from "./skeleton/ProfilePostSkeleton";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -74,12 +75,17 @@ export function Profile() {
 
           <ProfileTab />
           <PostBox />
-          <ProfilePost
-            posts={posts}
-            user={user}
-            profileData={profileData}
-            loading={loading}
-          />
+          {
+            loading ? (
+              <ProfilePostSkeleton />
+            ) : (
+              <ProfilePost
+                posts={posts}
+                user={user}
+                profileData={profileData}
+              />
+            )
+          }
         </div>
       </div >
     </>
