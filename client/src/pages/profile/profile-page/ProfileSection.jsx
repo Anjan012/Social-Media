@@ -11,7 +11,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const ProfileSection = ({
     profileData,
-    user
+    user,
 }) => {
 
     const [isFollowing, setIsFollowing] = useState(profileData.isFollowing);
