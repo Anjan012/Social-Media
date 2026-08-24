@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { toast } from "sonner";
 import { PostBox } from "./shared/Postbox";
-import { PostSkeleton } from "./shared/skeleton/PostSkeleton";
+import { PostSkeleton } from "../components/post/skeleton/PostSkeleton";
 import { PostCard } from "../components/post/PostCard";
 
 const API_URL = import.meta.env.VITE_API_URL;
