@@ -19,6 +19,18 @@ import {
 } from "../services/forgetPassword.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
+export const getAuthCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+};
+
 export const signUp = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -102,30 +114,17 @@ export const signIn = async (req, res) => {
       expiresIn: "1d",
     });
 
-    const userData = user.toObject(); // Convert Mongoose document to plain object
-    delete userData.password; // Remove password field
-    console.log(token);
+    const userData = user.toObject();
+    delete userData.password;
+
+    const cookieOptions = getAuthCookieOptions();
 
     return res
       .status(200)
-      .cookie("token", token, {
-        // maxAge: 24 * 60 * 60 * 1000,
-        // httpOnly: true, // accessible only by web server
-        // // sameSite: "strict", // CSRF protection
-        // // secure: true,
-        // sameSite: "lax",
-        // secure: false,
-
-        httpOnly: true,
-        secure: true, // Important for HTTPS (Render uses HTTPS)
-        sameSite: "none", // Required for cross-domain
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: "/",
-      })
+      .cookie("token", token, cookieOptions)
       .json({
         message: `Welcome back, ${user.username}`,
         success: true,
-        token,
         userData,
       });
   } catch (error) {
@@ -141,13 +140,7 @@ export const logout = async (req, res) => {
   try {
     return res
       .status(200)
-      .clearCookie("token", {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: false,
-        // sameSite: "strict",
-        // secure: true, // enable this in production (HTTPS)
-      })
+      .clearCookie("token", getAuthCookieOptions())
       .json({
         message: "logged out successfully",
         success: true,
