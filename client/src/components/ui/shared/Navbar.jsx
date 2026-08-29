@@ -36,7 +36,7 @@ export const Navbar = () => {
 
             await axios.delete(LOGOUT_URL, { withCredentials: true });
 
-            setAuthUser(null); 
+            setAuthUser(null);
             localStorage.removeItem('someToken'); // if
             toast("Logged out successfully");
             navigate('/signin');
@@ -59,7 +59,12 @@ export const Navbar = () => {
                         <div className="shrink-0">
                             <Link to="/" className="flex items-center gap-2">
                                 <span className="text-2xl sm:text-3xl font-bold tracking-tight text-red-500 hover:text-red-600 transition-colors">
-                                    MyApp
+                                    <img
+                                        src="/vynk-logo.jpg"
+                                        alt="Vynk"
+                                        className="w-26"
+                                    />
+                                {/* Vynk */}
                                 </span>
                             </Link>
                         </div>
