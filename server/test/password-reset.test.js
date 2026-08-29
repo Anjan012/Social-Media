@@ -13,6 +13,10 @@ const { default: isAuthenticated } = await import(
   "../middlewares/isAuthenticated.js"
 );
 const { User } = await import("../models/user.model.js");
+const { Post } = await import("../models/post.model.js");
+const { toggleLike, addComment, getUserPost } = await import(
+  "../controllers/post.controller.js"
+);
 const { normalizeEmail, validateResetInput } = await import(
   "../services/forgetPassword.service.js"
 );
@@ -212,4 +216,142 @@ test("auth cookie configuration is environment-aware", () => {
   assert.equal(developmentOptions.sameSite, "lax");
 
   process.env.NODE_ENV = originalNodeEnv;
+});
+
+test("toggleLike returns a full JSON response with updated like state", async () => {
+  const originalFindById = Post.findById;
+  const mockPost = {
+    _id: "post-1",
+    likes: ["user-2"],
+    async save() {
+      this.likes = this.likes.includes("user-1") ? this.likes : [...this.likes, "user-1"];
+      return this;
+    },
+  };
+
+  Post.findById = async () => mockPost;
+
+  const res = {
+    statusCode: 0,
+    body: null,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(payload) {
+      this.body = payload;
+      return this;
+    },
+  };
+
+  await toggleLike({ id: "user-1", params: { id: "post-1" } }, res);
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.success, true);
+  assert.equal(res.body.postId, "post-1");
+  assert.equal(res.body.isLiked, true);
+  assert.equal(res.body.likeCount, 2);
+
+  Post.findById = originalFindById;
+});
+
+test("addComment returns success JSON and handles errors", async () => {
+  const originalFindById = Post.findById;
+  const mockPost = {
+    _id: "post-1",
+    comments: [],
+    async save() {
+      this.comments.push({ user: "user-1", text: "hello" });
+      return this;
+    },
+  };
+
+  Post.findById = async () => mockPost;
+
+  const successRes = {
+    statusCode: 0,
+    body: null,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(payload) {
+      this.body = payload;
+      return this;
+    },
+  };
+
+  await addComment(
+    { id: "user-1", params: { id: "post-1" }, body: { comment: "hello" } },
+    successRes
+  );
+
+  assert.equal(successRes.statusCode, 200);
+  assert.equal(successRes.body.success, true);
+  assert.equal(successRes.body.message, "Comment added successfully!");
+
+  Post.findById = async () => null;
+
+  const notFoundRes = {
+    statusCode: 0,
+    body: null,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(payload) {
+      this.body = payload;
+      return this;
+    },
+  };
+
+  await addComment(
+    { id: "user-1", params: { id: "post-1" }, body: { comment: "hello" } },
+    notFoundRes
+  );
+
+  assert.equal(notFoundRes.statusCode, 404);
+  assert.equal(notFoundRes.body.success, false);
+
+  Post.findById = originalFindById;
+});
+
+test("getUserPost returns a posts array matching the feed response shape", async () => {
+  const originalFind = Post.find;
+  const fakePosts = [{ _id: "post-1" }];
+
+  Post.find = () => ({
+    populate() {
+      return {
+        populate() {
+          return {
+            sort() {
+              return fakePosts;
+            },
+          };
+        },
+      };
+    },
+  });
+
+  const res = {
+    statusCode: 0,
+    body: null,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(payload) {
+      this.body = payload;
+      return this;
+    },
+  };
+
+  await getUserPost({ id: "user-1" }, res);
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(Array.isArray(res.body.posts), true);
+  assert.equal(res.body.posts[0]._id, "post-1");
+
+  Post.find = originalFind;
 });

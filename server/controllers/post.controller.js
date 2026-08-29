@@ -169,12 +169,12 @@ export const getUserPost = async (req, res) => {
   try {
     const userId = req.id;
 
-    const post = await Post.find({ createdBy: userId })
+    const posts = await Post.find({ createdBy: userId })
       .populate("createdBy", "username fullname profilePicture")
       .populate("comments.user", "username profilePicture")
       .sort({ createdAt: -1 });
 
-    if (!post) {
+    if (!posts) {
       return res.status(404).json({
         message: "Post not found!",
         success: false,
@@ -184,7 +184,7 @@ export const getUserPost = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Posts fetched successfully!",
-      post,
+      posts,
     });
   } catch (error) {
     console.log(`Error while fetching post: ${error}`);
@@ -205,23 +205,33 @@ export const toggleLike = async (req, res) => {
     if (!post) {
       return res.status(404).json({
         message: "no post found",
-        status: false,
+        success: false,
       });
     }
 
-    const isLiked = post.likes.includes(userId);
+    const likes = Array.isArray(post.likes) ? post.likes : [];
+    const isLiked = likes.some((likeUserId) => likeUserId.toString() === userId.toString());
 
-    if(isLiked) {
-      post.likes.pull(userId);
-    }
-    else {
-      post.likes.addToSet(userId);
+    if (isLiked) {
+      post.likes = likes.filter((likeUserId) => likeUserId.toString() !== userId.toString());
+    } else {
+      post.likes = [...likes, userId];
     }
 
     await post.save();
 
+    return res.status(200).json({
+      success: true,
+      postId,
+      isLiked: !isLiked,
+      likeCount: post.likes.length,
+    });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
@@ -240,15 +250,23 @@ export const addComment = async (req, res) => {
       });
     }
 
-    post.comments.push({user: id, text: comment});
+    post.comments.push({ user: id, text: comment });
 
     await post.save();
 
     return res.status(200).json({
       message: "Comment added successfully!",
       success: true,
+      comment: {
+        user: id,
+        text: comment,
+      },
     });
   } catch (error) {
-    
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 }
