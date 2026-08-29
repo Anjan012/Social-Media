@@ -8,11 +8,18 @@ const POSTS_URL = `${API_URL}/api/v1/posts`;
  * touch axios directly. Endpoints are unchanged from the original Home.jsx.
  */
 export const postService = {
-  getAllPosts: () => axios.get(POSTS_URL, { withCredentials: true }),
- 
+  getAllPosts: ({ page = 1, limit = 20 } = {}) =>
+    axios.get(POSTS_URL, {
+      params: {
+        page,
+        limit,
+      },
+      withCredentials: true,
+    }),
+
   deletePost: (postId) =>
     axios.delete(`${POSTS_URL}/${postId}`, { withCredentials: true }),
- 
+
   toggleLike: (postId) =>
     axios.post(`${POSTS_URL}/${postId}/like`, {}, { withCredentials: true }),
 };

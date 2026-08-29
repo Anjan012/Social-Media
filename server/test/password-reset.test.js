@@ -318,6 +318,7 @@ test("addComment returns success JSON and handles errors", async () => {
 
 test("getUserPost returns a posts array matching the feed response shape", async () => {
   const originalFind = Post.find;
+  const originalCountDocuments = Post.countDocuments;
   const fakePosts = [{ _id: "post-1" }];
 
   Post.find = () => ({
@@ -326,7 +327,73 @@ test("getUserPost returns a posts array matching the feed response shape", async
         populate() {
           return {
             sort() {
-              return fakePosts;
+              return {
+                skip() {
+                  return {
+                    limit() {
+                      return fakePosts;
+                    },
+                  };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  });
+  Post.countDocuments = async () => 1;
+
+  const res = {
+    statusCode: 0,
+    body: null,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(payload) {
+      this.body = payload;
+      return this;
+    },
+  };
+
+  await getUserPost({ id: "user-1", query: {} }, res);
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(Array.isArray(res.body.posts), true);
+  assert.equal(res.body.posts[0]._id, "post-1");
+  assert.equal(res.body.limit, 20);
+  assert.equal(res.body.page, 1);
+
+  Post.find = originalFind;
+  Post.countDocuments = originalCountDocuments;
+});
+
+test("getAllPost applies pagination defaults and exposes hasMore metadata", async () => {
+  const originalFindById = (await import("../models/user.model.js")).User.findById;
+  const originalFind = Post.find;
+  const originalCountDocuments = Post.countDocuments;
+  const fakePosts = Array.from({ length: 5 }, (_, index) => ({ _id: `post-${index}` }));
+
+  (await import("../models/user.model.js")).User.findById = async () => ({
+    following: ["user-2"],
+  });
+  Post.countDocuments = async () => 25;
+  Post.find = () => ({
+    populate() {
+      return {
+        populate() {
+          return {
+            sort() {
+              return {
+                skip() {
+                  return {
+                    limit() {
+                      return fakePosts;
+                    },
+                  };
+                },
+              };
             },
           };
         },
@@ -347,11 +414,18 @@ test("getUserPost returns a posts array matching the feed response shape", async
     },
   };
 
-  await getUserPost({ id: "user-1" }, res);
+  await (await import("../controllers/post.controller.js")).getAllPost(
+    { id: "user-1", query: {} },
+    res
+  );
 
   assert.equal(res.statusCode, 200);
   assert.equal(Array.isArray(res.body.posts), true);
-  assert.equal(res.body.posts[0]._id, "post-1");
+  assert.equal(res.body.limit, 20);
+  assert.equal(res.body.page, 1);
+  assert.equal(res.body.hasMore, true);
 
+  (await import("../models/user.model.js")).User.findById = originalFindById;
   Post.find = originalFind;
+  Post.countDocuments = originalCountDocuments;
 });

@@ -4,6 +4,25 @@ import mongoose from "mongoose";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
 
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 50;
+
+const getPagination = (query = {}) => {
+  const requestedPage = Number(query.page);
+  const requestedLimit = Number(query.limit);
+
+  const page = Number.isFinite(requestedPage) && requestedPage > 0 ? Math.floor(requestedPage) : 1;
+  const limit = Number.isFinite(requestedLimit) && requestedLimit > 0
+    ? Math.min(Math.floor(requestedLimit), MAX_PAGE_SIZE)
+    : DEFAULT_PAGE_SIZE;
+
+  return {
+    page,
+    limit,
+    skip: (page - 1) * limit,
+  };
+};
+
 export const createPost = async (req, res) => {
   try {
     const { content } = req.body;
@@ -58,8 +77,9 @@ export const createPost = async (req, res) => {
 export const getAllPost = async (req, res) => {
   try {
     const userId = req.id;
+    const { page, limit, skip } = getPagination(req.query);
 
-    const user = await User.findById(userId).select("following");
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -68,19 +88,29 @@ export const getAllPost = async (req, res) => {
       });
     }
 
-    const userIds = [...user.following, userId];
+    const following = Array.isArray(user.following) ? user.following : [];
+    const userIds = [...following, userId];
+    const baseQuery = { createdBy: { $in: userIds } };
 
-    const posts = await Post.find({
-      createdBy: { $in: userIds }, // $in means mongodb operator it matches document where createdBy is any one of these Ids, Give me all posts where the creator is either me or someone I follow
-    })
-      .populate("createdBy", "username profilePicture") // populating createdBy with username and profile picture only
+    const totalPosts = await Post.countDocuments(baseQuery);
+    const posts = await Post.find(baseQuery)
+      .populate("createdBy", "username profilePicture")
       .populate("comments.user", "username profilePicture")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalPages = Math.max(1, Math.ceil(totalPosts / limit));
 
     return res.status(200).json({
       success: true,
       message: "Posts fetched successfully!",
       posts,
+      page,
+      limit,
+      totalPosts,
+      totalPages,
+      hasMore: page < totalPages,
     });
   } catch (error) {
     console.error("Get posts error:", error);
@@ -168,11 +198,15 @@ export const deletePost = async (req, res) => {
 export const getUserPost = async (req, res) => {
   try {
     const userId = req.id;
+    const { page, limit, skip } = getPagination(req.query);
 
+    const totalPosts = await Post.countDocuments({ createdBy: userId });
     const posts = await Post.find({ createdBy: userId })
       .populate("createdBy", "username fullname profilePicture")
       .populate("comments.user", "username profilePicture")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     if (!posts) {
       return res.status(404).json({
@@ -181,10 +215,17 @@ export const getUserPost = async (req, res) => {
       });
     }
 
+    const totalPages = Math.max(1, Math.ceil(totalPosts / limit));
+
     return res.status(200).json({
       success: true,
       message: "Posts fetched successfully!",
       posts,
+      page,
+      limit,
+      totalPosts,
+      totalPages,
+      hasMore: page < totalPages,
     });
   } catch (error) {
     console.log(`Error while fetching post: ${error}`);

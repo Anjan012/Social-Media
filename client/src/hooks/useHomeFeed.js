@@ -20,23 +20,33 @@ export function useHomeFeed() {
   const [likedPosts, setLikedPosts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
  
-  const fetchPosts = useCallback(async () => {
+  const fetchPosts = useCallback(async (nextPage = 1) => {
     try {
       setIsLoading(true);
       setError(null);
  
-      const response = await postService.getAllPosts();
-      const fetchedPosts = response.data.posts;
-      setPosts(fetchedPosts);
- 
+      const response = await postService.getAllPosts({
+        page: nextPage,
+        limit: 20,
+      });
+
+      const fetchedPosts = response.data.posts || [];
+      const isInitialLoad = nextPage === 1;
+
+      setPosts((prevPosts) => (isInitialLoad ? fetchedPosts : [...prevPosts, ...fetchedPosts]));
+      setPage(nextPage);
+      setHasMore(Boolean(response.data.hasMore));
+
       const initialLikedPosts = {};
       fetchedPosts.forEach((post) => {
         if (post.likes.includes(authUser?._id)) {
           initialLikedPosts[post._id] = true;
         }
       });
-      setLikedPosts(initialLikedPosts);
+      setLikedPosts((prev) => ({ ...prev, ...initialLikedPosts }));
     } catch (err) {
       console.error("Failed to fetch posts:", err);
       setError("Unable to load posts. Please try again.");
@@ -47,8 +57,13 @@ export function useHomeFeed() {
   }, [authUser?._id]);
  
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(1);
   }, [fetchPosts]);
+
+  const loadMore = useCallback(() => {
+    if (isLoading || !hasMore) return;
+    fetchPosts(page + 1);
+  }, [fetchPosts, hasMore, isLoading, page]);
  
   const toggleLike = useCallback(async (postId) => {
     const wasLiked = !!likedPosts[postId];
@@ -125,9 +140,11 @@ export function useHomeFeed() {
     posts: feed,
     isLoading,
     error,
+    hasMore,
     toggleLike,
     deletePost,
     copyPostLink,
+    loadMore,
     refetch: fetchPosts,
   };
 }
