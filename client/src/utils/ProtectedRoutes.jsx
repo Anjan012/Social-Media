@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import VynkLoader from "../components/VynkLoader";
 import { AuthContext } from "../context/AuthContext";
 
 export const ProtectedRoutes = () => {
@@ -8,7 +9,8 @@ export const ProtectedRoutes = () => {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>   
+        {/* <p>Loading...</p>    */}
+        <VynkLoader />
       </div>
     );
   }
