@@ -231,55 +231,9 @@ export const followUser = async (req, res) => {
     }
 
     const isFollower = await isFollowingService(userId, strangerId);
-    let followWriteSucceeded = false;
-    let legacyWriteSucceeded = false;
 
     if (isFollower) {
-      try {
-        const serviceResult = await unfollowUserService(userId, strangerId);
-        followWriteSucceeded = true;
-        if (!serviceResult) {
-          console.warn(
-            "Follow dual-write mismatch: unfollow service reported no deletion while legacy array path was used.",
-            { userId, strangerId },
-          );
-        }
-      } catch (error) {
-        console.error("Follow dual-write mismatch: legacy unfollow succeeded but Follow doc cleanup failed.", {
-          userId,
-          strangerId,
-          error,
-        });
-      }
-
-      try {
-        stranger.followers.pull(userId);
-        user.following.pull(strangerId);
-
-        await stranger.save();
-        await user.save();
-        legacyWriteSucceeded = true;
-      } catch (error) {
-        console.error("Follow dual-write mismatch: Follow doc removed but legacy arrays were not updated.", {
-          userId,
-          strangerId,
-          error,
-        });
-      }
-
-      if (followWriteSucceeded && !legacyWriteSucceeded) {
-        console.error("Follow dual-write partial failure: Follow doc updated but legacy arrays failed.", {
-          userId,
-          strangerId,
-        });
-      }
-
-      if (!followWriteSucceeded && legacyWriteSucceeded) {
-        console.error("Follow dual-write partial failure: legacy arrays updated but Follow doc failed.", {
-          userId,
-          strangerId,
-        });
-      }
+      await unfollowUserService(userId, strangerId);
 
       return res.status(200).json({
         success: true,
@@ -287,45 +241,7 @@ export const followUser = async (req, res) => {
       });
     }
 
-    try {
-      await followUserService(userId, strangerId);
-      followWriteSucceeded = true;
-    } catch (error) {
-      console.error("Follow dual-write mismatch: legacy follow succeeded but Follow doc creation failed.", {
-        userId,
-        strangerId,
-        error,
-      });
-    }
-
-    try {
-      stranger.followers.addToSet(userId);
-      user.following.addToSet(strangerId);
-
-      await stranger.save();
-      await user.save();
-      legacyWriteSucceeded = true;
-    } catch (error) {
-      console.error("Follow dual-write mismatch: Follow doc created but legacy arrays were not updated.", {
-        userId,
-        strangerId,
-        error,
-      });
-    }
-
-    if (followWriteSucceeded && !legacyWriteSucceeded) {
-      console.error("Follow dual-write partial failure: Follow doc updated but legacy arrays failed.", {
-        userId,
-        strangerId,
-      });
-    }
-
-    if (!followWriteSucceeded && legacyWriteSucceeded) {
-      console.error("Follow dual-write partial failure: legacy arrays updated but Follow doc failed.", {
-        userId,
-        strangerId,
-      });
-    }
+    await followUserService(userId, strangerId);
 
     return res.status(200).json({
       success: true,
