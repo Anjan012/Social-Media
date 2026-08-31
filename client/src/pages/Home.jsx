@@ -354,11 +354,12 @@ export const Home = () => {
     deletePost,
     copyPostLink,
     loadMore,
+    addCreatedPost,
   } = useHomeFeed();
 
   return (
     <AppLayout>
-      <PostComposer />
+      <PostComposer onSubmit={addCreatedPost} />
 
       {isLoading ? (
         <>
