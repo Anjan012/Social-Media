@@ -1,5 +1,6 @@
 import { User } from "../models/user.model.js";
 import { Post } from "../models/post.model.js";
+import { getFollowCounts, isFollowing } from "../services/follow.service.js";
 import { notFound } from "../utils/error/error-helper.js";
 
 export const getMeService = async (userId) => {
@@ -91,14 +92,25 @@ export const getUserProfileService = async ({
 
   const isOwnProfile = loggedInUserId === profileUserId;
 
-  const isFollowing = user.followers?.includes(loggedInUserId);
+  const [counts, isAlreadyFollowing] = await Promise.all([
+    getFollowCounts(profileUserId),
+    loggedInUserId && loggedInUserId !== profileUserId
+      ? isFollowing(loggedInUserId, profileUserId)
+      : false,
+  ]);
+
+  const userData = user.toObject ? user.toObject() : { ...user };
+  userData.followersCount = counts.followersCount;
+  userData.followingCount = counts.followingCount;
 
   return {
     success: true,
-    user,
+    user: userData,
     posts,
     isOwnProfile,
-    isFollowing,
+    isFollowing: isAlreadyFollowing,
+    followersCount: counts.followersCount,
+    followingCount: counts.followingCount,
     message: "User profile fetched successfully!",
   };
 };

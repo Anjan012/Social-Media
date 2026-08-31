@@ -3,6 +3,7 @@ import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
+import { getFollowing as getFollowingService } from "../services/follow.service.js";
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
@@ -88,8 +89,32 @@ export const getAllPost = async (req, res) => {
       });
     }
 
-    const following = Array.isArray(user.following) ? user.following : [];
-    const userIds = [...following, userId];
+    const followingIds = new Set([userId]);
+    let followingPage = 1;
+
+    while (true) {
+      const followingResult = await getFollowingService(userId, {
+        page: followingPage,
+        limit: 100,
+      });
+
+      const items = followingResult.items || [];
+
+      for (const item of items) {
+        const followingUserId = item.followingUserId?._id || item.followingUserId;
+        if (followingUserId) {
+          followingIds.add(String(followingUserId));
+        }
+      }
+
+      if (!followingResult.hasMore) {
+        break;
+      }
+
+      followingPage += 1;
+    }
+
+    const userIds = [...followingIds];
     const baseQuery = { createdBy: { $in: userIds } };
 
     const totalPosts = await Post.countDocuments(baseQuery);

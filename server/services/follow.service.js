@@ -6,6 +6,15 @@ import { ApiError } from "../utils/error/api-error.js";
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
 
+const normalizeObjectId = (value) => {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+
+  const candidate = value.toString();
+  return mongoose.Types.ObjectId.isValid(candidate) ? candidate : null;
+};
+
 const normalizePagination = ({ page = 1, limit = DEFAULT_PAGE_SIZE } = {}) => {
   const safePage =
     Number.isFinite(Number(page)) && Number(page) > 0 ? Number(page) : 1;
@@ -97,18 +106,32 @@ export const followUser = async (followerUserId, followingUserId) => {
 };
 
 export const unfollowUser = async (followerUserId, followingUserId) => {
+  const normalizedFollowerId = normalizeObjectId(followerUserId);
+  const normalizedFollowingId = normalizeObjectId(followingUserId);
+
+  if (!normalizedFollowerId || !normalizedFollowingId) {
+    return false;
+  }
+
   const result = await Follow.deleteOne({
-    followerUserId: followerUserId.toString(),
-    followingUserId: followingUserId.toString(),
+    followerUserId: normalizedFollowerId,
+    followingUserId: normalizedFollowingId,
   });
 
   return result.deletedCount > 0;
 };
 
 export const isFollowing = async (followerUserId, followingUserId) => {
+  const normalizedFollowerId = normalizeObjectId(followerUserId);
+  const normalizedFollowingId = normalizeObjectId(followingUserId);
+
+  if (!normalizedFollowerId || !normalizedFollowingId) {
+    return false;
+  }
+
   const followDoc = await findFollowDocument({
-    followerUserId: followerUserId.toString(),
-    followingUserId: followingUserId.toString(),
+    followerUserId: normalizedFollowerId,
+    followingUserId: normalizedFollowingId,
   });
 
   return Boolean(followDoc);
@@ -118,6 +141,19 @@ export const getFollowers = async (
   userId,
   { page = 1, limit = DEFAULT_PAGE_SIZE } = {},
 ) => {
+  const normalizedUserId = normalizeObjectId(userId);
+
+  if (!normalizedUserId) {
+    return {
+      items: [],
+      page: 1,
+      limit: DEFAULT_PAGE_SIZE,
+      total: 0,
+      totalPages: 1,
+      hasMore: false,
+    };
+  }
+
   const {
     skip,
     page: safePage,
@@ -125,13 +161,13 @@ export const getFollowers = async (
   } = normalizePagination({ page, limit });
 
   const [items, total] = await Promise.all([
-    Follow.find({ followingUserId: userId.toString() })
+    Follow.find({ followingUserId: normalizedUserId })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(safeLimit)
       .populate("followerUserId", "username fullname profilePicture")
       .lean(),
-    Follow.countDocuments({ followingUserId: userId.toString() }),
+    Follow.countDocuments({ followingUserId: normalizedUserId }),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / safeLimit));
@@ -150,6 +186,19 @@ export const getFollowing = async (
   userId,
   { page = 1, limit = DEFAULT_PAGE_SIZE } = {},
 ) => {
+  const normalizedUserId = normalizeObjectId(userId);
+
+  if (!normalizedUserId) {
+    return {
+      items: [],
+      page: 1,
+      limit: DEFAULT_PAGE_SIZE,
+      total: 0,
+      totalPages: 1,
+      hasMore: false,
+    };
+  }
+
   const {
     skip,
     page: safePage,
@@ -157,13 +206,13 @@ export const getFollowing = async (
   } = normalizePagination({ page, limit });
 
   const [items, total] = await Promise.all([
-    Follow.find({ followerUserId: userId.toString() })
+    Follow.find({ followerUserId: normalizedUserId })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(safeLimit)
       .populate("followingUserId", "username fullname profilePicture")
       .lean(),
-    Follow.countDocuments({ followerUserId: userId.toString() }),
+    Follow.countDocuments({ followerUserId: normalizedUserId }),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / safeLimit));
@@ -179,9 +228,18 @@ export const getFollowing = async (
 };
 
 export const getFollowCounts = async (userId) => {
+  const normalizedUserId = normalizeObjectId(userId);
+
+  if (!normalizedUserId) {
+    return {
+      followersCount: 0,
+      followingCount: 0,
+    };
+  }
+
   const [followersCount, followingCount] = await Promise.all([
-    Follow.countDocuments({ followingUserId: userId.toString() }),
-    Follow.countDocuments({ followerUserId: userId.toString() }),
+    Follow.countDocuments({ followingUserId: normalizedUserId }),
+    Follow.countDocuments({ followerUserId: normalizedUserId }),
   ]);
 
   return {

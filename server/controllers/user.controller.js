@@ -20,6 +20,7 @@ import {
 import {
   followUser as followUserService,
   unfollowUser as unfollowUserService,
+  isFollowing as isFollowingService,
 } from "../services/follow.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
@@ -229,7 +230,7 @@ export const followUser = async (req, res) => {
       });
     }
 
-    const isFollower = stranger.followers.includes(userId);
+    const isFollower = await isFollowingService(userId, strangerId);
     let followWriteSucceeded = false;
     let legacyWriteSucceeded = false;
 

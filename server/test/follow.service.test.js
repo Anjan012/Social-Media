@@ -12,7 +12,16 @@ const {
 } = await import("../services/follow.service.js");
 const { User } = await import("../models/user.model.js");
 
-const makeUserId = (suffix) => `64f6a1b0d5b5ea00123456${suffix}`;
+const makeUserId = (suffix) => {
+  const map = {
+    a: "64f6a1b0d5b5ea0012345678",
+    b: "64f6a1b0d5b5ea0012345679",
+    c: "64f6a1b0d5b5ea0012345680",
+    z: "64f6a1b0d5b5ea00123456ff",
+  };
+
+  return map[suffix] || `64f6a1b0d5b5ea00123456${String(suffix).slice(0, 2)}`;
+};
 
 const setupFollowState = ({ existing = [], userMap = {} } = {}) => {
   const seededFollows = [...existing];
