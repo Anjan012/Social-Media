@@ -345,12 +345,21 @@ import { EmptyState } from "./shared/EmptyState";
 import { useHomeFeed } from "../hooks/useHomeFeed";
 
 export const Home = () => {
-  const { posts, isLoading, error, toggleLike, deletePost, copyPostLink } =
-    useHomeFeed();
+  const {
+    posts,
+    isLoading,
+    error,
+    hasMore,
+    toggleLike,
+    deletePost,
+    copyPostLink,
+    loadMore,
+    addCreatedPost,
+  } = useHomeFeed();
 
   return (
     <AppLayout>
-      <PostComposer />
+      <PostComposer onSubmit={addCreatedPost} />
 
       {isLoading ? (
         <>
@@ -363,18 +372,32 @@ export const Home = () => {
       ) : posts.length === 0 ? (
         <EmptyState message="No posts yet." />
       ) : (
-        posts.map((post) => (
-          <PostCard
-            key={post._id}
-            post={post}
-            isLiked={post.isLiked}
-            likeCount={post.likeCount}
-            isOwnPost={post.isOwnPost}
-            onLike={toggleLike}
-            onDelete={deletePost}
-            onCopyLink={copyPostLink}
-          />
-        ))
+        <>
+          {posts.map((post) => (
+            <PostCard
+              key={post._id}
+              post={post}
+              isLiked={post.isLiked}
+              likeCount={post.likeCount}
+              isOwnPost={post.isOwnPost}
+              onLike={toggleLike}
+              onDelete={deletePost}
+              onCopyLink={copyPostLink}
+            />
+          ))}
+
+          {hasMore && (
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={loadMore}
+                className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-gray-900 dark:text-red-400 dark:hover:bg-gray-800"
+              >
+                Load more
+              </button>
+            </div>
+          )}
+        </>
       )}
     </AppLayout>
   );

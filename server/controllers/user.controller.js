@@ -17,7 +17,24 @@ import {
   forgetPasswordService as _forgetPasswordService,
   resetpasswordService as _resetpasswordService,
 } from "../services/forgetPassword.service.js";
+import {
+  followUser as followUserService,
+  unfollowUser as unfollowUserService,
+  isFollowing as isFollowingService,
+} from "../services/follow.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
+
+export const getAuthCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+};
 
 export const signUp = async (req, res) => {
   try {
@@ -102,30 +119,17 @@ export const signIn = async (req, res) => {
       expiresIn: "1d",
     });
 
-    const userData = user.toObject(); // Convert Mongoose document to plain object
-    delete userData.password; // Remove password field
-    console.log(token);
+    const userData = user.toObject();
+    delete userData.password;
+
+    const cookieOptions = getAuthCookieOptions();
 
     return res
       .status(200)
-      .cookie("token", token, {
-        // maxAge: 24 * 60 * 60 * 1000,
-        // httpOnly: true, // accessible only by web server
-        // // sameSite: "strict", // CSRF protection
-        // // secure: true,
-        // sameSite: "lax",
-        // secure: false,
-
-        httpOnly: true,
-        secure: true, // Important for HTTPS (Render uses HTTPS)
-        sameSite: "none", // Required for cross-domain
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: "/",
-      })
+      .cookie("token", token, cookieOptions)
       .json({
         message: `Welcome back, ${user.username}`,
         success: true,
-        token,
         userData,
       });
   } catch (error) {
@@ -141,13 +145,7 @@ export const logout = async (req, res) => {
   try {
     return res
       .status(200)
-      .clearCookie("token", {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: false,
-        // sameSite: "strict",
-        // secure: true, // enable this in production (HTTPS)
-      })
+      .clearCookie("token", getAuthCookieOptions())
       .json({
         message: "logged out successfully",
         success: true,
@@ -232,33 +230,23 @@ export const followUser = async (req, res) => {
       });
     }
 
-    const isFollower = stranger.followers.includes(userId);
+    const isFollower = await isFollowingService(userId, strangerId);
 
     if (isFollower) {
-      // UNFOLLOW
-      stranger.followers.pull(userId);
-      user.following.pull(strangerId);
-
-      await stranger.save();
-      await user.save();
+      await unfollowUserService(userId, strangerId);
 
       return res.status(200).json({
         success: true,
         message: "Unfollowed successfully",
       });
-    } else {
-      // FOLLOW
-      stranger.followers.addToSet(userId);
-      user.following.addToSet(strangerId);
-
-      await stranger.save();
-      await user.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "You are following " + stranger.username,
-      });
     }
+
+    await followUserService(userId, strangerId);
+
+    return res.status(200).json({
+      success: true,
+      message: "You are following " + stranger.username,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({

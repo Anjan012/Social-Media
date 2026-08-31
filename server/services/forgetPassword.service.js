@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import { PasswordReset } from "../models/passwordReset.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { transporter } from "../config/mail.js";
@@ -108,10 +109,12 @@ export const forgetPasswordService = async ({ email, ip }) => {
 
   const resetTokenExpires = new Date(Date.now() + PASSWORD_RESET_TTL_MS);
 
-  user.passwordResetTokenHash = resetTokenHash;
-  user.passwordResetExpires = resetTokenExpires;
-
-  await user.save();
+  const pendingPasswordReset = await PasswordReset.create({
+    userId: user._id,
+    tokenHash: resetTokenHash,
+    expiresAt: resetTokenExpires,
+    usedAt: null,
+  });
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
@@ -371,18 +374,7 @@ export const forgetPasswordService = async ({ email, ip }) => {
   try {
     await transporter.sendMail(mailOptions);
   } catch (err) {
-    await User.updateOne(
-      {
-        _id: user._id,
-        passwordResetTokenHash: resetTokenHash,
-      },
-      {
-        $set: {
-          passwordResetTokenHash: null,
-          passwordResetExpires: null,
-        },
-      },
-    );
+    await PasswordReset.deleteOne({ _id: pendingPasswordReset._id });
 
     throw internalServerError("Unable to send password reset email");
   }
@@ -400,10 +392,17 @@ export const resetpasswordService = async ({ token, newPassword }) => {
     .update(token)
     .digest("hex");
 
-  const user = await User.findOne({
-    passwordResetTokenHash: resetTokenHash,
-    passwordResetExpires: { $gt: new Date() },
+  const passwordResetRecord = await PasswordReset.findOne({
+    tokenHash: resetTokenHash,
+    expiresAt: { $gt: new Date() },
+    usedAt: null,
   });
+
+  if (!passwordResetRecord) {
+    unauthorized("Invalid or expired reset token");
+  }
+
+  const user = await User.findById(passwordResetRecord.userId);
 
   if (!user) {
     unauthorized("Invalid or expired reset token");
@@ -415,14 +414,10 @@ export const resetpasswordService = async ({ token, newPassword }) => {
   const updatedUser = await User.findOneAndUpdate(
     {
       _id: user._id,
-      passwordResetTokenHash: resetTokenHash,
-      passwordResetExpires: { $gt: new Date() },
     },
     {
       $set: {
         password: hashedPassword,
-        passwordResetTokenHash: null,
-        passwordResetExpires: null,
       },
     },
     { new: true },
@@ -431,4 +426,9 @@ export const resetpasswordService = async ({ token, newPassword }) => {
   if (!updatedUser) {
     unauthorized("Invalid or expired reset token");
   }
+
+  await PasswordReset.updateOne(
+    { _id: passwordResetRecord._id },
+    { $set: { usedAt: new Date() } },
+  );
 };

@@ -82,6 +82,7 @@ export function Profile() {
             ) : (
               <ProfilePost
                 posts={posts}
+                setPosts={setPosts}
                 user={user}
                 profileData={profileData}
               />

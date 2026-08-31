@@ -1,7 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import axios from "axios";
-import { toast } from "sonner";
 import {
     Popover,
     PopoverContent,
@@ -21,95 +19,34 @@ import {
     Copy,
     Share2,
     VolumeX,
-    UserMinus,
 } from "lucide-react";
 import { Image as EllipsisVertical } from "lucide-react";
-import { useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { useContext, useEffect } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { formatDate } from "../../../lib/formatter";
+import { getLikeSnapshot, usePostActions } from "../../../hooks/usePostActions";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-export const ProfilePost = (
-    {
-        posts,
-    }
-) => {
-
+export const ProfilePost = ({ posts, setPosts }) => {
     const { authUser } = useContext(AuthContext);
-    const [likedPosts, setLikedPosts] = useState({});
-
-
-    const isOwnPost = true;
-
-    useEffect(() => {
-        if (!posts || !authUser?._id) return;
-
-        const initialLiked = {};
-        posts.forEach(post => {
-            // Check if current user has liked this post
-            initialLiked[post._id] = post.likes.includes(authUser._id);
-        });
-
-        setLikedPosts(initialLiked);
-    }, [posts, authUser?._id]);
-
-    const toggleLike = async (postId) => {
-        const wasLiked = !!likedPosts[postId];
-        const newIsLiked = !wasLiked;
-
-        // Optimistic update
-        setLikedPosts(prev => ({
-            ...prev,
-            [postId]: newIsLiked
-        }));
-
-        try {
-            const LIKE_URL = `${API_URL}/api/v1/posts/${postId}/like`;
-            await axios.post(LIKE_URL, {}, { withCredentials: true });
-
-            // No need to call fetchPosts() here
-            // The like count will be updated optimistically below
-
-        } catch (error) {
-            console.error(error);
-            // Revert on error
-            setLikedPosts(prev => ({
-                ...prev,
-                [postId]: wasLiked
-            }));
-            toast.error("Couldn't update like");
-        }
-    };
-
+    const { toggleLike, deletePost } = usePostActions({
+        posts,
+        setPosts,
+        authUserId: authUser?._id,
+    });
 
     const handleDeletePost = async (postId) => {
-        try {
-
-            const DELETE_URL = `${API_URL}/api/v1/posts/${postId}`;
-            const response = await axios.delete(
-                DELETE_URL,
-                { withCredentials: true }
-            );
-
-            if (response.status === 200) {
-                toast(`Post deleted successfully ${postId}`);
-            }
-
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message);
-        }
-    }
+        const deleted = await deletePost(postId);
+        if (!deleted) return;
+    };
 
     return (
         <>
             {posts.map((post) => {
-                const isLiked = !!likedPosts[post._id]; // true if user just liked it
-                const likeCount = post.likes.length + (isLiked && !post.likes.includes(authUser._id) ? 1 : 0)
-                    - (!isLiked && post.likes.includes(authUser._id) ? 1 : 0);
+                const isOwnPost = post.createdBy?._id === authUser?._id;
+                const snapshot = getLikeSnapshot(post, authUser?._id, undefined);
+                const isLiked = snapshot.isLiked;
+                const likeCount = snapshot.likeCount;
 
                 return (
                     <div

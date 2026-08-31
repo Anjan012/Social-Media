@@ -3,6 +3,26 @@ import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
+import { getFollowing as getFollowingService } from "../services/follow.service.js";
+
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 50;
+
+const getPagination = (query = {}) => {
+  const requestedPage = Number(query.page);
+  const requestedLimit = Number(query.limit);
+
+  const page = Number.isFinite(requestedPage) && requestedPage > 0 ? Math.floor(requestedPage) : 1;
+  const limit = Number.isFinite(requestedLimit) && requestedLimit > 0
+    ? Math.min(Math.floor(requestedLimit), MAX_PAGE_SIZE)
+    : DEFAULT_PAGE_SIZE;
+
+  return {
+    page,
+    limit,
+    skip: (page - 1) * limit,
+  };
+};
 
 export const createPost = async (req, res) => {
   try {
@@ -58,8 +78,9 @@ export const createPost = async (req, res) => {
 export const getAllPost = async (req, res) => {
   try {
     const userId = req.id;
+    const { page, limit, skip } = getPagination(req.query);
 
-    const user = await User.findById(userId).select("following");
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -68,19 +89,53 @@ export const getAllPost = async (req, res) => {
       });
     }
 
-    const userIds = [...user.following, userId];
+    const followingIds = new Set([userId]);
+    let followingPage = 1;
 
-    const posts = await Post.find({
-      createdBy: { $in: userIds }, // $in means mongodb operator it matches document where createdBy is any one of these Ids, Give me all posts where the creator is either me or someone I follow
-    })
-      .populate("createdBy", "username profilePicture") // populating createdBy with username and profile picture only
+    while (true) {
+      const followingResult = await getFollowingService(userId, {
+        page: followingPage,
+        limit: 100,
+      });
+
+      const items = followingResult.items || [];
+
+      for (const item of items) {
+        const followingUserId = item.followingUserId?._id || item.followingUserId;
+        if (followingUserId) {
+          followingIds.add(String(followingUserId));
+        }
+      }
+
+      if (!followingResult.hasMore) {
+        break;
+      }
+
+      followingPage += 1;
+    }
+
+    const userIds = [...followingIds];
+    const baseQuery = { createdBy: { $in: userIds } };
+
+    const totalPosts = await Post.countDocuments(baseQuery);
+    const posts = await Post.find(baseQuery)
+      .populate("createdBy", "username profilePicture")
       .populate("comments.user", "username profilePicture")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalPages = Math.max(1, Math.ceil(totalPosts / limit));
 
     return res.status(200).json({
       success: true,
       message: "Posts fetched successfully!",
       posts,
+      page,
+      limit,
+      totalPosts,
+      totalPages,
+      hasMore: page < totalPages,
     });
   } catch (error) {
     console.error("Get posts error:", error);
@@ -168,23 +223,34 @@ export const deletePost = async (req, res) => {
 export const getUserPost = async (req, res) => {
   try {
     const userId = req.id;
+    const { page, limit, skip } = getPagination(req.query);
 
-    const post = await Post.find({ createdBy: userId })
+    const totalPosts = await Post.countDocuments({ createdBy: userId });
+    const posts = await Post.find({ createdBy: userId })
       .populate("createdBy", "username fullname profilePicture")
       .populate("comments.user", "username profilePicture")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    if (!post) {
+    if (!posts) {
       return res.status(404).json({
         message: "Post not found!",
         success: false,
       });
     }
 
+    const totalPages = Math.max(1, Math.ceil(totalPosts / limit));
+
     return res.status(200).json({
       success: true,
       message: "Posts fetched successfully!",
-      post,
+      posts,
+      page,
+      limit,
+      totalPosts,
+      totalPages,
+      hasMore: page < totalPages,
     });
   } catch (error) {
     console.log(`Error while fetching post: ${error}`);
@@ -205,23 +271,33 @@ export const toggleLike = async (req, res) => {
     if (!post) {
       return res.status(404).json({
         message: "no post found",
-        status: false,
+        success: false,
       });
     }
 
-    const isLiked = post.likes.includes(userId);
+    const likes = Array.isArray(post.likes) ? post.likes : [];
+    const isLiked = likes.some((likeUserId) => likeUserId.toString() === userId.toString());
 
-    if(isLiked) {
-      post.likes.pull(userId);
-    }
-    else {
-      post.likes.addToSet(userId);
+    if (isLiked) {
+      post.likes = likes.filter((likeUserId) => likeUserId.toString() !== userId.toString());
+    } else {
+      post.likes = [...likes, userId];
     }
 
     await post.save();
 
+    return res.status(200).json({
+      success: true,
+      postId,
+      isLiked: !isLiked,
+      likeCount: post.likes.length,
+    });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
@@ -240,15 +316,23 @@ export const addComment = async (req, res) => {
       });
     }
 
-    post.comments.push({user: id, text: comment});
+    post.comments.push({ user: id, text: comment });
 
     await post.save();
 
     return res.status(200).json({
       message: "Comment added successfully!",
       success: true,
+      comment: {
+        user: id,
+        text: comment,
+      },
     });
   } catch (error) {
-    
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 }
