@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import { PasswordReset } from "../models/passwordReset.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { transporter } from "../config/mail.js";
@@ -107,11 +108,25 @@ export const forgetPasswordService = async ({ email, ip }) => {
     .digest("hex");
 
   const resetTokenExpires = new Date(Date.now() + PASSWORD_RESET_TTL_MS);
+  const requestedAt = new Date();
 
-  user.passwordResetTokenHash = resetTokenHash;
-  user.passwordResetExpires = resetTokenExpires;
+  const pendingPasswordReset = await PasswordReset.create({
+    userId: user._id,
+    tokenHash: resetTokenHash,
+    expiresAt: resetTokenExpires,
+    usedAt: null,
+  });
 
-  await user.save();
+  try {
+    user.passwordResetTokenHash = resetTokenHash;
+    user.passwordResetExpires = resetTokenExpires;
+    user.passwordResetRequestedAt = requestedAt;
+
+    await user.save();
+  } catch (error) {
+    await PasswordReset.deleteOne({ _id: pendingPasswordReset._id });
+    throw error;
+  }
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
@@ -371,6 +386,8 @@ export const forgetPasswordService = async ({ email, ip }) => {
   try {
     await transporter.sendMail(mailOptions);
   } catch (err) {
+    await PasswordReset.deleteOne({ _id: pendingPasswordReset._id });
+
     await User.updateOne(
       {
         _id: user._id,
@@ -380,6 +397,7 @@ export const forgetPasswordService = async ({ email, ip }) => {
         $set: {
           passwordResetTokenHash: null,
           passwordResetExpires: null,
+          passwordResetRequestedAt: null,
         },
       },
     );
@@ -400,10 +418,24 @@ export const resetpasswordService = async ({ token, newPassword }) => {
     .update(token)
     .digest("hex");
 
-  const user = await User.findOne({
-    passwordResetTokenHash: resetTokenHash,
-    passwordResetExpires: { $gt: new Date() },
+  const passwordResetRecord = await PasswordReset.findOne({
+    tokenHash: resetTokenHash,
+    expiresAt: { $gt: new Date() },
+    usedAt: null,
   });
+
+  let user = null;
+
+  if (passwordResetRecord) {
+    user = await User.findById(passwordResetRecord.userId);
+  }
+
+  if (!user) {
+    user = await User.findOne({
+      passwordResetTokenHash: resetTokenHash,
+      passwordResetExpires: { $gt: new Date() },
+    });
+  }
 
   if (!user) {
     unauthorized("Invalid or expired reset token");
@@ -415,14 +447,22 @@ export const resetpasswordService = async ({ token, newPassword }) => {
   const updatedUser = await User.findOneAndUpdate(
     {
       _id: user._id,
-      passwordResetTokenHash: resetTokenHash,
-      passwordResetExpires: { $gt: new Date() },
+      $or: [
+        {
+          passwordResetTokenHash: resetTokenHash,
+          passwordResetExpires: { $gt: new Date() },
+        },
+        {
+          _id: user._id,
+        },
+      ],
     },
     {
       $set: {
         password: hashedPassword,
         passwordResetTokenHash: null,
         passwordResetExpires: null,
+        passwordResetRequestedAt: null,
       },
     },
     { new: true },
@@ -430,5 +470,12 @@ export const resetpasswordService = async ({ token, newPassword }) => {
 
   if (!updatedUser) {
     unauthorized("Invalid or expired reset token");
+  }
+
+  if (passwordResetRecord) {
+    await PasswordReset.updateOne(
+      { _id: passwordResetRecord._id },
+      { $set: { usedAt: new Date() } },
+    );
   }
 };
