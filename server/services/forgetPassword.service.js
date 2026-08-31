@@ -108,7 +108,6 @@ export const forgetPasswordService = async ({ email, ip }) => {
     .digest("hex");
 
   const resetTokenExpires = new Date(Date.now() + PASSWORD_RESET_TTL_MS);
-  const requestedAt = new Date();
 
   const pendingPasswordReset = await PasswordReset.create({
     userId: user._id,
@@ -116,17 +115,6 @@ export const forgetPasswordService = async ({ email, ip }) => {
     expiresAt: resetTokenExpires,
     usedAt: null,
   });
-
-  try {
-    user.passwordResetTokenHash = resetTokenHash;
-    user.passwordResetExpires = resetTokenExpires;
-    user.passwordResetRequestedAt = requestedAt;
-
-    await user.save();
-  } catch (error) {
-    await PasswordReset.deleteOne({ _id: pendingPasswordReset._id });
-    throw error;
-  }
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
@@ -388,20 +376,6 @@ export const forgetPasswordService = async ({ email, ip }) => {
   } catch (err) {
     await PasswordReset.deleteOne({ _id: pendingPasswordReset._id });
 
-    await User.updateOne(
-      {
-        _id: user._id,
-        passwordResetTokenHash: resetTokenHash,
-      },
-      {
-        $set: {
-          passwordResetTokenHash: null,
-          passwordResetExpires: null,
-          passwordResetRequestedAt: null,
-        },
-      },
-    );
-
     throw internalServerError("Unable to send password reset email");
   }
 
@@ -424,18 +398,11 @@ export const resetpasswordService = async ({ token, newPassword }) => {
     usedAt: null,
   });
 
-  let user = null;
-
-  if (passwordResetRecord) {
-    user = await User.findById(passwordResetRecord.userId);
+  if (!passwordResetRecord) {
+    unauthorized("Invalid or expired reset token");
   }
 
-  if (!user) {
-    user = await User.findOne({
-      passwordResetTokenHash: resetTokenHash,
-      passwordResetExpires: { $gt: new Date() },
-    });
-  }
+  const user = await User.findById(passwordResetRecord.userId);
 
   if (!user) {
     unauthorized("Invalid or expired reset token");
@@ -447,22 +414,10 @@ export const resetpasswordService = async ({ token, newPassword }) => {
   const updatedUser = await User.findOneAndUpdate(
     {
       _id: user._id,
-      $or: [
-        {
-          passwordResetTokenHash: resetTokenHash,
-          passwordResetExpires: { $gt: new Date() },
-        },
-        {
-          _id: user._id,
-        },
-      ],
     },
     {
       $set: {
         password: hashedPassword,
-        passwordResetTokenHash: null,
-        passwordResetExpires: null,
-        passwordResetRequestedAt: null,
       },
     },
     { new: true },
@@ -472,10 +427,8 @@ export const resetpasswordService = async ({ token, newPassword }) => {
     unauthorized("Invalid or expired reset token");
   }
 
-  if (passwordResetRecord) {
-    await PasswordReset.updateOne(
-      { _id: passwordResetRecord._id },
-      { $set: { usedAt: new Date() } },
-    );
-  }
+  await PasswordReset.updateOne(
+    { _id: passwordResetRecord._id },
+    { $set: { usedAt: new Date() } },
+  );
 };
