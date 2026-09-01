@@ -1,8 +1,14 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "../../../components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "../../../components/ui/dialog";
 import { Link as LinkIcon, MapPin, Users } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -14,15 +20,70 @@ export const ProfileSection = ({
     user,
 }) => {
 
-    const [isFollowing, setIsFollowing] = useState(profileData.isFollowing);
-    const [followerCount, setFollowerCount] = useState(user.followers?.length || 0)
-
-    useEffect(() => {
-        setIsFollowing(profileData.isFollowing);
-        setFollowerCount(user.followers?.length || 0);
-    }, [profileData.isFollowing, user.followers]);
+    const [isFollowing, setIsFollowing] = useState(Boolean(profileData?.isFollowing));
+    const [followerCount, setFollowerCount] = useState(Number(profileData?.followersCount || 0));
+    const [followingCount, setFollowingCount] = useState(Number(profileData?.followingCount || 0));
+    const [followDialog, setFollowDialog] = useState({
+        open: false,
+        type: "followers",
+        items: [],
+        loading: false,
+    });
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        setIsFollowing(Boolean(profileData?.isFollowing));
+        setFollowerCount(Number(profileData?.followersCount || 0));
+        setFollowingCount(Number(profileData?.followingCount || 0));
+    }, [profileData?.isFollowing, profileData?.followersCount, profileData?.followingCount]);
+
+    const refreshFollowCounts = async (id) => {
+        try {
+            const response = await axios.get(`${API_URL}/api/v1/users/${id}/follow-counts`, {
+                withCredentials: true,
+            });
+
+            const counts = response?.data?.data || {};
+            setFollowerCount(Number(counts.followersCount || 0));
+            setFollowingCount(Number(counts.followingCount || 0));
+        } catch (error) {
+            console.error("Failed to refresh follow counts:", error);
+        }
+    };
+
+    const fetchFollowList = async (type) => {
+        if (!user?._id) return;
+
+        setFollowDialog({
+            open: true,
+            type,
+            items: [],
+            loading: true,
+        });
+
+        try {
+            const response = await axios.get(`${API_URL}/api/v1/users/${user._id}/${type}`, {
+                withCredentials: true,
+            });
+
+            const items = response?.data?.data?.items || [];
+            setFollowDialog({
+                open: true,
+                type,
+                items,
+                loading: false,
+            });
+        } catch (error) {
+            console.error(`Failed to fetch ${type}:`, error);
+            setFollowDialog({
+                open: true,
+                type,
+                items: [],
+                loading: false,
+            });
+        }
+    };
 
     const handleFollow = async (id) => {
         try {
@@ -36,8 +97,9 @@ export const ProfileSection = ({
 
             if (res.status === 200) {
                 toast(res.data.message);
-                setIsFollowing((prev)=> !prev);
-                setFollowerCount((prev) => isFollowing ? prev - 1 : prev + 1);
+                const nextFollowingState = !isFollowing;
+                setIsFollowing(nextFollowingState);
+                await refreshFollowCounts(id);
             }
 
         } catch (error) {
@@ -82,18 +144,26 @@ export const ProfileSection = ({
                                         </span>
                                         <span className="text-gray-500 dark:text-gray-400">Posts</span>
                                     </div>
-                                    <div className="flex items-center gap-1.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => fetchFollowList("followers")}
+                                        className="flex items-center gap-1.5 hover:opacity-80 focus:outline-none cursor-pointer"
+                                    >
                                         <span className="font-bold text-gray-900 dark:text-white">
-                                            {user.followers?.length || 0}
+                                            {followerCount}
                                         </span>
                                         <span className="text-gray-500 dark:text-gray-400">Followers</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => fetchFollowList("following")}
+                                        className="flex items-center gap-1.5 hover:opacity-80 focus:outline-none cursor-pointer"
+                                    >
                                         <span className="font-bold text-gray-900 dark:text-white">
-                                            {user.following?.length || 0}
+                                            {followingCount}
                                         </span>
                                         <span className="text-gray-500 dark:text-gray-400">Following</span>
-                                    </div>
+                                    </button>
                                 </div>
 
                                 {/* Bio */}
@@ -172,18 +242,26 @@ export const ProfileSection = ({
                                             </span>
                                             <span className="text-gray-500 dark:text-gray-400">Posts</span>
                                         </div>
-                                        <div className="flex items-center gap-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => fetchFollowList("followers")}
+                                            className="flex items-center gap-1.5 hover:opacity-80 focus:outline-none cursor-pointer"
+                                        >
                                             <span className="font-bold text-gray-900 dark:text-white">
                                                 {followerCount}
                                             </span>
                                             <span className="text-gray-500 dark:text-gray-400">Followers</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => fetchFollowList("following")}
+                                            className="flex items-center gap-1.5 hover:opacity-80 focus:outline-none cursor-pointer"
+                                        >
                                             <span className="font-bold text-gray-900 dark:text-white">
-                                                {user.following?.length || 0}
+                                                {followingCount}
                                             </span>
                                             <span className="text-gray-500 dark:text-gray-400">Following</span>
-                                        </div>
+                                        </button>
                                     </div>
 
                                     {/* Bio */}
@@ -240,9 +318,68 @@ export const ProfileSection = ({
                     )
             }
 
+            <Dialog
+                open={followDialog.open}
+                onOpenChange={(nextOpen) =>
+                    setFollowDialog((prev) => ({
+                        ...prev,
+                        open: nextOpen,
+                    }))
+                }
+            >
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="capitalize">
+                            {followDialog.type === "followers" ? "Followers" : "Following"}
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1">
+                        {followDialog.loading ? (
+                            <div className="py-8 text-center text-sm text-gray-500">Loading...</div>
+                        ) : followDialog.items.length === 0 ? (
+                            <div className="py-8 text-center text-sm text-gray-500">
+                                No {followDialog.type === "followers" ? "followers" : "following users"} yet.
+                            </div>
+                        ) : (
+                            followDialog.items.map((item) => {
+                                const followUser = followDialog.type === "followers"
+                                    ? item?.followerUserId
+                                    : item?.followingUserId;
+
+                                if (!followUser) return null;
+
+                                return (
+                                    <Link
+                                        key={followUser._id || item._id}
+                                        type="button"
+                                        onClick={() => {
+                                            setFollowDialog((prev) => ({ ...prev, open: false }));
+                                            navigate(`/profile/${followUser._id}`);
+                                        }}
+                                        className="flex w-full items-center gap-3 rounded-lg border border-gray-200 p-3 text-left transition hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
+                                    >
+                                        <Avatar className="h-10 w-10">
+                                            <AvatarImage src={followUser.profilePicture || ""} alt={followUser.username} />
+                                            <AvatarFallback className="bg-red-500 text-white">
+                                                {followUser.username?.[0]?.toUpperCase() || "U"}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="min-w-0">
+                                            <p className="truncate font-medium text-gray-900 dark:text-white">
+                                                {followUser.username}
+                                            </p>
+                                            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                                                {followUser.fullname || "@" + followUser.username}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                );
+                            })
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
-
-
-
-    )
+    );
 }
