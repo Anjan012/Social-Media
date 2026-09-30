@@ -10,7 +10,7 @@ import { MobileBottomNav } from "./MobileBottomNav";
  * - lg+: DesktopSidebar appears on the left
  * - xl+: RightSidebar appears on the right
  */
-export const AppLayout = ({ children }) => (
+export const AppLayout = ({ children, showRightSidebar = true }) => (
   <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
     <Navbar />
 
@@ -19,7 +19,7 @@ export const AppLayout = ({ children }) => (
 
       <main className="min-w-0 flex-1">{children}</main>
 
-      <RightSidebar />
+      {showRightSidebar && <RightSidebar />}
     </div>
 
     <MobileBottomNav />

@@ -10,6 +10,9 @@ import SearchPage from "./pages/search/SearchPage";
 import { ProtectedRoutes } from "./utils/ProtectedRoutes";
 import ForgotPassword from "./pages/forget-password/ForgotPassword";
 import ResetPassword from "./pages/forget-password/ResetPassword";
+import { Notifications } from "./pages/Notifications";
+import { Explore } from "./pages/Explore";
+import { Messages } from "./pages/Messages";
 
 const appRouter = createBrowserRouter([
   {
@@ -48,6 +51,18 @@ const appRouter = createBrowserRouter([
       {
         path: "/search",
         element: <SearchPage />,
+      },
+      {
+        path: "/explore",
+        element: <Explore />,
+      },
+      {
+        path: "/notifications",
+        element: <Notifications />,
+      },
+      {
+        path: "/messages",
+        element: <Messages />,
       },
       {
         path: "/post/:id/comment",
