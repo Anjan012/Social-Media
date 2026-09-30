@@ -1,7 +1,18 @@
 import { useMemo, useState } from "react";
-import { ArrowUpRight, ChevronDown, Compass, Search, SlidersHorizontal, Sparkles, Users } from "lucide-react";
+import { ArrowUpRight, Search, SlidersHorizontal, Users } from "lucide-react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { ExplorePostCard } from "../components/explore/ExplorePostCard";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "../components/ui/dialog";
+import { Button } from "../components/ui/button";
 
 const EXPLORE_POSTS = [
     {
@@ -95,35 +106,62 @@ export const Explore = () => {
     };
 
     return (
-        <AppLayout>
+        <AppLayout showRightSidebar={false}>
             <section className="mx-auto w-full max-w-5xl pb-6">
-                <header className="relative overflow-hidden border-b border-gray-200 bg-white px-5 py-8 sm:px-8 sm:py-10 dark:border-gray-800 dark:bg-gray-900">
-                    <div className="relative z-10 max-w-2xl">
-                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-red-500">
-                            <Compass className="size-4" /> Discover something good
-                        </div>
-                        <h1 className="mt-3 max-w-xl text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl dark:text-white">A little more of what you like.</h1>
-                        <p className="mt-3 max-w-lg text-sm leading-6 text-gray-500 sm:text-base dark:text-gray-400">Find thoughtful posts, fresh perspectives, and people worth following.</p>
-                    </div>
-                    <Sparkles className="absolute -right-2 -top-5 size-36 rotate-12 text-red-50 sm:right-8 sm:top-2 dark:text-red-950/40" strokeWidth={1} />
-
-                    <div className="relative mt-7 flex max-w-2xl items-center gap-3">
+                <div className="border-b border-gray-200 bg-white px-4 py-4 sm:px-6 dark:border-gray-800 dark:bg-gray-900">
+                    <div className="flex items-center gap-2">
                         <label className="relative min-w-0 flex-1">
                             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
                             <input
                                 value={query}
                                 onChange={(event) => setQuery(event.target.value)}
-                                placeholder="Search people, posts, or topics"
-                                className="h-12 w-full rounded-xl border border-gray-200 bg-gray-50 pl-11 pr-4 text-sm text-gray-900 outline-none transition focus:border-red-400 focus:bg-white focus:ring-4 focus:ring-red-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-red-500 dark:focus:bg-gray-800"
+                                placeholder="Search explore"
+                                className="h-10 w-full rounded-lg border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-red-400 focus:bg-white focus:ring-4 focus:ring-red-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-red-500 dark:focus:bg-gray-800"
                             />
                         </label>
-                        <button type="button" aria-label="Open explore filters" className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 transition hover:border-red-300 hover:text-red-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                            <SlidersHorizontal className="size-5" />
-                        </button>
+                        <select
+                            value={activeTopic}
+                            onChange={(event) => setActiveTopic(event.target.value)}
+                            aria-label="Filter by topic"
+                            className="hidden h-10 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm font-medium text-gray-700 outline-none focus:border-red-400 focus:ring-4 focus:ring-red-500/10 sm:block dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                        >
+                            {TOPICS.map((topic) => <option key={topic}>{topic}</option>)}
+                        </select>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" size="icon" aria-label="Open explore filters" className="size-10 shrink-0">
+                                    <SlidersHorizontal className="size-4" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>Filter explore</DialogTitle>
+                                    <DialogDescription>Choose what you want to see first.</DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-2">
+                                    <label className="grid gap-2 text-sm font-medium">
+                                        Topic
+                                        <select value={activeTopic} onChange={(event) => setActiveTopic(event.target.value)} className="h-10 rounded-md border border-gray-200 bg-background px-3 text-sm outline-none focus:border-red-400 focus:ring-4 focus:ring-red-500/10 dark:border-gray-700">
+                                            {TOPICS.map((topic) => <option key={topic}>{topic}</option>)}
+                                        </select>
+                                    </label>
+                                    <label className="grid gap-2 text-sm font-medium">
+                                        Sort by
+                                        <select value={sortOrder} onChange={(event) => setSortOrder(event.target.value)} className="h-10 rounded-md border border-gray-200 bg-background px-3 text-sm outline-none focus:border-red-400 focus:ring-4 focus:ring-red-500/10 dark:border-gray-700">
+                                            <option>Featured</option>
+                                            <option>Popular</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <DialogFooter>
+                                    <DialogClose asChild><Button>Apply filters</Button></DialogClose>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
-                </header>
+                </div>
 
-                <div className="sticky top-14 z-20 -mx-0 border-b border-gray-200 bg-gray-50/95 px-1 py-3 backdrop-blur sm:top-16 dark:border-gray-800 dark:bg-gray-950/95">
+                <div className="sticky top-14 z-20 mx-0 border-b border-gray-200 bg-gray-50/95 px-1 py-3 backdrop-blur sm:top-16 dark:border-gray-800 dark:bg-gray-950/95">
                     <div className="flex items-center justify-between gap-3">
                         <nav className="flex min-w-0 gap-1 overflow-x-auto" aria-label="Explore topics">
                             {TOPICS.map((topic) => (
@@ -132,9 +170,7 @@ export const Explore = () => {
                                 </button>
                             ))}
                         </nav>
-                        <button type="button" onClick={() => setSortOrder(sortOrder === "Featured" ? "Popular" : "Featured")} className="flex shrink-0 items-center gap-1.5 rounded-full px-2 py-2 text-xs font-semibold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                            {sortOrder} <ChevronDown className="size-3.5" />
-                        </button>
+                        <span className="hidden shrink-0 text-xs font-medium text-gray-400 sm:block">{sortOrder}</span>
                     </div>
                 </div>
 
