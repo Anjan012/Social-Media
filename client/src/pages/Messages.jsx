@@ -7,10 +7,10 @@ import { ConversationList } from "../components/messages/ConversationList";
 import { MessageThread } from "../components/messages/MessageThread";
 
 const INITIAL_CONVERSATIONS = [
-    { id: "maya", name: "Maya Rodriguez", initials: "MR", time: "9:42 AM", preview: "That interface feels so considered.", online: true, unread: true, avatar: "" },
-    { id: "noah", name: "Noah Williams", initials: "NW", time: "Yesterday", preview: "Sent you a photo", online: false, unread: false, avatar: "" },
-    { id: "sofia", name: "Sofia Chen", initials: "SC", time: "Mon", preview: "Let’s catch up this week.", online: true, unread: false, avatar: "" },
-    { id: "studio", name: "The Studio", initials: "TS", time: "Sun", preview: "Oliver: The new draft is ready", online: false, unread: true, avatar: "" },
+    { id: "maya", name: "Maya Rodriguez", initials: "MR", time: "9:42 AM", preview: "That interface feels so considered.", online: true, unread: true, group: false, avatar: "" },
+    { id: "noah", name: "Noah Williams", initials: "NW", time: "Yesterday", preview: "Sent you a photo", online: false, unread: false, group: false, avatar: "" },
+    { id: "sofia", name: "Sofia Chen", initials: "SC", time: "Mon", preview: "Let’s catch up this week.", online: true, unread: false, group: false, avatar: "" },
+    { id: "studio", name: "The Studio", initials: "TS", time: "Sun", preview: "Oliver: The new draft is ready", online: false, unread: true, group: true, avatar: "" },
 ];
 
 const INITIAL_MESSAGES = {
@@ -32,13 +32,21 @@ export const Messages = () => {
     const [selectedId, setSelectedId] = useState("maya");
     const [messages, setMessages] = useState(INITIAL_MESSAGES);
     const [search, setSearch] = useState("");
+    const [activeFilter, setActiveFilter] = useState("all");
     const [draft, setDraft] = useState("");
     const [callType, setCallType] = useState(null);
     const [showDetails, setShowDetails] = useState(false);
     const [mobileThreadOpen, setMobileThreadOpen] = useState(false);
 
-    const selectedConversation = conversations.find((conversation) => conversation.id === selectedId) || conversations[0];
-    const visibleConversations = useMemo(() => conversations.filter((conversation) => conversation.name.toLowerCase().includes(search.trim().toLowerCase())), [conversations, search]);
+    const selectedConversation = conversations.find((conversation) => conversation.id === selectedId);
+    const visibleConversations = useMemo(() => conversations.filter((conversation) => {
+        const matchesSearch = conversation.name.toLowerCase().includes(search.trim().toLowerCase());
+        const matchesFilter = activeFilter === "all"
+            || (activeFilter === "unread" && conversation.unread)
+            || (activeFilter === "groups" && conversation.group)
+            || (activeFilter === "direct" && !conversation.group);
+        return matchesSearch && matchesFilter;
+    }), [activeFilter, conversations, search]);
 
     const selectConversation = (id) => {
         setSelectedId(id);
@@ -54,16 +62,23 @@ export const Messages = () => {
         setDraft("");
     };
 
+    const closeChatWindow = () => {
+        setSelectedId(null);
+        setShowDetails(false);
+        setCallType(null);
+        setMobileThreadOpen(false);
+    };
+
     return (
         <AppLayout showRightSidebar={false}>
-            <section className="mx-auto flex h-[calc(100vh-7rem)] min-h-[560px] w-full max-w-5xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <section className="mx-auto flex h-[calc(100vh-7rem)] min-h-140 w-full max-w-5xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
                 <div className={`w-full md:flex md:w-auto ${mobileThreadOpen ? "hidden" : "flex"}`}>
-                    <ConversationList conversations={visibleConversations} selectedId={selectedId} search={search} onSearch={setSearch} onSelect={selectConversation} />
+                    <ConversationList conversations={visibleConversations} selectedId={selectedId} search={search} activeFilter={activeFilter} onFilterChange={setActiveFilter} onSearch={setSearch} onSelect={selectConversation} />
                 </div>
                 <div className={`min-w-0 flex-1 ${mobileThreadOpen ? "flex" : "hidden md:flex"}`}>
-                    {selectedConversation && <MessageThread conversation={selectedConversation} messages={messages[selectedId] || []} draft={draft} onDraftChange={setDraft} onSend={sendMessage} onBack={() => setMobileThreadOpen(false)} onCall={setCallType} onToggleDetails={() => setShowDetails((current) => !current)} showDetails={showDetails} />}
+                    {selectedConversation ? <MessageThread conversation={selectedConversation} messages={messages[selectedId] || []} draft={draft} onDraftChange={setDraft} onSend={sendMessage} onBack={() => setMobileThreadOpen(false)} onCall={setCallType} onClose={closeChatWindow} onToggleDetails={() => setShowDetails((current) => !current)} showDetails={showDetails} /> : <div className="flex flex-1 items-center justify-center p-8 text-center text-sm text-gray-500">Select a conversation to start messaging.</div>}
                 </div>
-                {showDetails && <aside className="hidden w-60 shrink-0 border-l border-gray-200 p-5 lg:block dark:border-gray-800">
+                {showDetails && selectedConversation && <aside className="hidden w-60 shrink-0 border-l border-gray-200 p-5 lg:block dark:border-gray-800">
                     <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Conversation</p>
                     <div className="mt-5 flex flex-col items-center text-center">
                         <div className="flex size-16 items-center justify-center rounded-full bg-red-100 text-lg font-bold text-red-700 dark:bg-red-950 dark:text-red-200">{selectedConversation.initials}</div>

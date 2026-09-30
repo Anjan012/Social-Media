@@ -1,8 +1,8 @@
-import { ArrowLeft, MoreHorizontal, Phone, Video } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, Phone, Video, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 
-export const MessageThread = ({ conversation, messages, draft, onDraftChange, onSend, onBack, onCall, onToggleDetails, showDetails }) => (
+export const MessageThread = ({ conversation, messages, draft, onDraftChange, onSend, onBack, onCall, onClose, onToggleDetails, showDetails }) => (
     <section className="flex min-h-0 min-w-0 flex-1 flex-col bg-white dark:bg-gray-900">
         <header className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-5 dark:border-gray-800">
             <div className="flex min-w-0 items-center gap-3">
@@ -27,6 +27,7 @@ export const MessageThread = ({ conversation, messages, draft, onDraftChange, on
                 <Button variant="ghost" size="icon" onClick={() => onCall("audio")} aria-label="Start audio call" className="text-gray-500 hover:bg-red-50 hover:text-red-500"><Phone className="size-4" /></Button>
                 <Button variant="ghost" size="icon" onClick={() => onCall("video")} aria-label="Start video call" className="text-gray-500 hover:bg-red-50 hover:text-red-500"><Video className="size-4" /></Button>
                 <Button variant="ghost" size="icon" onClick={onToggleDetails} aria-label="More conversation details" className={`hidden text-gray-500 hover:bg-red-50 hover:text-red-500 sm:inline-flex ${showDetails ? "bg-red-50 text-red-500 dark:bg-red-950/30" : ""}`}><MoreHorizontal className="size-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close chat window" title="Close chat window" className="text-gray-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"><X className="size-4" /></Button>
             </div>
         </header>
 

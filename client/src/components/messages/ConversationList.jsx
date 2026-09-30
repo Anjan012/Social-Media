@@ -2,7 +2,14 @@ import { Search, Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Input } from "../ui/input";
 
-export const ConversationList = ({ conversations, selectedId, search, onSearch, onSelect }) => (
+const FILTERS = [
+    { id: "all", label: "All" },
+    { id: "unread", label: "Unread" },
+    { id: "direct", label: "Direct" },
+    { id: "groups", label: "Groups" },
+];
+
+export const ConversationList = ({ conversations, selectedId, search, activeFilter, onFilterChange, onSearch, onSelect }) => (
     <aside className="flex min-h-0 w-full flex-col border-gray-200 bg-white md:w-[300px] md:shrink-0 md:border-r dark:border-gray-800 dark:bg-gray-900">
         <div className="border-b border-gray-100 px-4 py-4 dark:border-gray-800">
             <div className="flex items-center justify-between">
@@ -18,6 +25,18 @@ export const ConversationList = ({ conversations, selectedId, search, onSearch, 
                 <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
                 <Input value={search} onChange={(event) => onSearch(event.target.value)} placeholder="Search messages" className="h-9 bg-gray-50 pl-9 text-sm dark:bg-gray-800" />
             </label>
+            <div className="mt-3 flex gap-1 overflow-x-auto pb-0.5">
+                {FILTERS.map((filter) => (
+                    <button
+                        key={filter.id}
+                        type="button"
+                        onClick={() => onFilterChange(filter.id)}
+                        className={`whitespace-nowrap rounded-full px-2.5 py-1.5 text-[11px] font-semibold transition ${activeFilter === filter.id ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900" : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"}`}
+                    >
+                        {filter.label}
+                    </button>
+                ))}
+            </div>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto p-2">
