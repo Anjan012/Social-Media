@@ -11,6 +11,7 @@ import { ProtectedRoutes } from "./utils/ProtectedRoutes";
 import ForgotPassword from "./pages/forget-password/ForgotPassword";
 import ResetPassword from "./pages/forget-password/ResetPassword";
 import { Notifications } from "./pages/Notifications";
+import { Explore } from "./pages/Explore";
 
 const appRouter = createBrowserRouter([
   {
@@ -49,6 +50,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/search",
         element: <SearchPage />,
+      },
+      {
+        path: "/explore",
+        element: <Explore />,
       },
       {
         path: "/notifications",
