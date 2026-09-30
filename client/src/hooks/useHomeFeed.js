@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext } from "react";
+import { useState, useEffect, useCallback, useContext, useRef } from "react";
 import { toast } from "sonner";
 import { AuthContext } from "../context/AuthContext";
 import { postService } from "../services/postService";
@@ -6,9 +6,11 @@ import { getLikeSnapshot, usePostActions } from "./usePostActions";
 
 export function useHomeFeed() {
   const { authUser } = useContext(AuthContext);
+  const requestInFlightRef = useRef(false);
 
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -20,10 +22,14 @@ export function useHomeFeed() {
   });
 
   const fetchPosts = useCallback(async (nextPage = 1) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+    if (requestInFlightRef.current) return;
 
+    requestInFlightRef.current = true;
+    setError(null);
+    setIsLoading(nextPage === 1);
+    setIsLoadingMore(nextPage > 1);
+
+    try {
       const response = await postService.getAllPosts({
         page: nextPage,
         limit: 20,
@@ -39,7 +45,9 @@ export function useHomeFeed() {
       console.error("Failed to fetch posts:", err);
       setError("Unable to load posts. Please try again.");
     } finally {
+      requestInFlightRef.current = false;
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   }, []);
 
@@ -48,9 +56,9 @@ export function useHomeFeed() {
   }, [fetchPosts]);
 
   const loadMore = useCallback(() => {
-    if (isLoading || !hasMore) return;
+    if (requestInFlightRef.current || isLoading || isLoadingMore || !hasMore) return;
     fetchPosts(page + 1);
-  }, [fetchPosts, hasMore, isLoading, page]);
+  }, [fetchPosts, hasMore, isLoading, isLoadingMore, page]);
 
   const copyPostLink = useCallback(async (postId) => {
     const url = `${window.location.origin}/post/${postId}/comment`;
@@ -104,6 +112,7 @@ export function useHomeFeed() {
   return {
     posts: feed,
     isLoading,
+    isLoadingMore,
     error,
     hasMore,
     toggleLike,

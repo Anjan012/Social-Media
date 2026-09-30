@@ -336,6 +336,7 @@
 // };
 
 
+import { useEffect, useRef } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { PostComposer } from "../components/post/PostComposer";
 import { PostCard } from "../components/post/PostCard";
@@ -345,9 +346,12 @@ import { EmptyState } from "./shared/EmptyState";
 import { useHomeFeed } from "../hooks/useHomeFeed";
 
 export const Home = () => {
+  const sentinelRef = useRef(null);
+
   const {
     posts,
     isLoading,
+    isLoadingMore,
     error,
     hasMore,
     toggleLike,
@@ -356,6 +360,31 @@ export const Home = () => {
     loadMore,
     addCreatedPost,
   } = useHomeFeed();
+
+  useEffect(() => {
+    if (!hasMore || isLoading) return;
+
+    const node = sentinelRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          loadMore();
+        }
+      },
+      {
+        root: null,
+        threshold: 0.1,
+        rootMargin: "250px 0px",
+      },
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, loadMore]);
 
   return (
     <AppLayout>
@@ -387,14 +416,10 @@ export const Home = () => {
           ))}
 
           {hasMore && (
-            <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                onClick={loadMore}
-                className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-gray-900 dark:text-red-400 dark:hover:bg-gray-800"
-              >
-                Load more
-              </button>
+            <div ref={sentinelRef} className="mt-4 flex justify-center py-3">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {isLoadingMore ? "Loading more posts..." : "Scroll to load more"}
+              </div>
             </div>
           )}
         </>
